@@ -15,12 +15,6 @@ public class Time
         implements ASN1Choice {
     ASN1Primitive time;
 
-    public static Time getInstance(
-            ASN1TaggedObject obj,
-            boolean explicit) {
-        return getInstance(obj.getObject()); // must be explicitly tagged
-    }
-
     public Time(
             ASN1Primitive time) {
         if (!(time instanceof ASN1UTCTime)

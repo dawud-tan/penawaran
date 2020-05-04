@@ -1,27 +1,19 @@
 package org.bouncycastle.jcajce.provider.asymmetric.x509;
 
 import org.bouncycastle.asn1.ASN1Encoding;
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Primitive;
-import org.bouncycastle.asn1.util.ASN1Dump;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.CRLDistPoint;
-import org.bouncycastle.asn1.x509.CRLNumber;
 import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.GeneralNames;
-import org.bouncycastle.asn1.x509.IssuingDistributionPoint;
 import org.bouncycastle.asn1.x509.TBSCertList;
 import org.bouncycastle.jcajce.io.OutputStreamFactory;
 import org.bouncycastle.jcajce.util.JcaJceHelper;
 import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.util.Arrays;
-import org.bouncycastle.util.Strings;
-import org.bouncycastle.util.encoders.Hex;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -45,7 +37,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import javax.security.auth.x500.X500Principal;
@@ -333,99 +324,7 @@ abstract class X509CRLImpl
      * @return a string representation of this CRL.
      */
     public String toString() {
-        StringBuffer buf = new StringBuffer();
-        String nl = Strings.lineSeparator();
-
-        buf.append("              Version: ").append(this.getVersion()).append(
-                nl);
-        buf.append("             IssuerDN: ").append(this.getIssuerDN())
-                .append(nl);
-        buf.append("          This update: ").append(this.getThisUpdate())
-                .append(nl);
-        buf.append("          Next update: ").append(this.getNextUpdate())
-                .append(nl);
-        buf.append("  Signature Algorithm: ").append(this.getSigAlgName())
-                .append(nl);
-
-        byte[] sig = this.getSignature();
-
-        buf.append("            Signature: ").append(
-                new String(Hex.encode(sig, 0, 20))).append(nl);
-        for (int i = 20; i < sig.length; i += 20) {
-            if (i < sig.length - 20) {
-                buf.append("                       ").append(
-                        new String(Hex.encode(sig, i, 20))).append(nl);
-            } else {
-                buf.append("                       ").append(
-                        new String(Hex.encode(sig, i, sig.length - i))).append(nl);
-            }
-        }
-
-        Extensions extensions = c.getTBSCertList().getExtensions();
-
-        if (extensions != null) {
-            Enumeration e = extensions.oids();
-
-            if (e.hasMoreElements()) {
-                buf.append("           Extensions: ").append(nl);
-            }
-
-            while (e.hasMoreElements()) {
-                ASN1ObjectIdentifier oid = (ASN1ObjectIdentifier) e.nextElement();
-                Extension ext = extensions.getExtension(oid);
-
-                if (ext.getExtnValue() != null) {
-                    byte[] octs = ext.getExtnValue().getOctets();
-                    ASN1InputStream dIn = new ASN1InputStream(octs);
-                    buf.append("                       critical(").append(
-                            ext.isCritical()).append(") ");
-                    try {
-                        if (oid.equals(Extension.cRLNumber)) {
-                            buf.append(
-                                    new CRLNumber(ASN1Integer.getInstance(
-                                            dIn.readObject()).getPositiveValue()))
-                                    .append(nl);
-                        } else if (oid.equals(Extension.deltaCRLIndicator)) {
-                            buf.append(
-                                    "Base CRL: "
-                                            + new CRLNumber(ASN1Integer.getInstance(
-                                            dIn.readObject()).getPositiveValue()))
-                                    .append(nl);
-                        } else if (oid
-                                .equals(Extension.issuingDistributionPoint)) {
-                            buf.append(
-                                    IssuingDistributionPoint.getInstance(dIn.readObject())).append(nl);
-                        } else if (oid
-                                .equals(Extension.cRLDistributionPoints)) {
-                            buf.append(
-                                    CRLDistPoint.getInstance(dIn.readObject())).append(nl);
-                        } else if (oid.equals(Extension.freshestCRL)) {
-                            buf.append(
-                                    CRLDistPoint.getInstance(dIn.readObject())).append(nl);
-                        } else {
-                            buf.append(oid.getId());
-                            buf.append(" value = ").append(
-                                    ASN1Dump.dumpAsString(dIn.readObject()))
-                                    .append(nl);
-                        }
-                    } catch (Exception ex) {
-                        buf.append(oid.getId());
-                        buf.append(" value = ").append("*****").append(nl);
-                    }
-                } else {
-                    buf.append(nl);
-                }
-            }
-        }
-        Set set = getRevokedCertificates();
-        if (set != null) {
-            Iterator it = set.iterator();
-            while (it.hasNext()) {
-                buf.append(it.next());
-                buf.append(nl);
-            }
-        }
-        return buf.toString();
+        return X509CRLImpl.class.getCanonicalName();
     }
 
     /**

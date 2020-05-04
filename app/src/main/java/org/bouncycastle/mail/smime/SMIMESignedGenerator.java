@@ -8,7 +8,6 @@ import org.bouncycastle.cms.SignerInfoGenerator;
 import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationStore;
 import org.bouncycastle.mail.smime.util.CRLFOutputStream;
-import org.bouncycastle.util.Store;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -104,9 +103,6 @@ public class SMIMESignedGenerator
 
     private final String defaultContentTransferEncoding;
     private final Map micAlgs;
-    private List certStores = new ArrayList();
-    private List crlStores = new ArrayList();
-    private List attrCertStores = new ArrayList();
     private List signerInfoGens = new ArrayList();
     private List _signers = new ArrayList();
     private List _oldSigners = new ArrayList();
@@ -264,18 +260,6 @@ public class SMIMESignedGenerator
         protected CMSSignedDataStreamGenerator getGenerator()
                 throws CMSException {
             CMSSignedDataStreamGenerator gen = new CMSSignedDataStreamGenerator();
-
-            for (Iterator it = certStores.iterator(); it.hasNext(); ) {
-                gen.addCertificates((Store) it.next());
-            }
-
-            for (Iterator it = crlStores.iterator(); it.hasNext(); ) {
-                gen.addCRLs((Store) it.next());
-            }
-
-            for (Iterator it = attrCertStores.iterator(); it.hasNext(); ) {
-                gen.addAttributeCertificates((Store) it.next());
-            }
 
             for (Iterator it = signerInfoGens.iterator(); it.hasNext(); ) {
                 gen.addSignerInfoGenerator((SignerInfoGenerator) it.next());

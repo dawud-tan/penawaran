@@ -60,15 +60,6 @@ public class ContentInfo
         this.content = content;
     }
 
-    public ASN1ObjectIdentifier getContentType()
-    {
-        return contentType;
-    }
-
-    public ASN1Encodable getContent()
-    {
-        return content;
-    }
 
     /**
      * Produce an object suitable for an ASN1OutputStream.

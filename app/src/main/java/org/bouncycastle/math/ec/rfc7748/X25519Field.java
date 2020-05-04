@@ -1,4 +1,5 @@
 package org.bouncycastle.math.ec.rfc7748;
+
 public abstract class X25519Field {
     public static final int SIZE = 10;
     private static final int M24 = 0x00FFFFFF;
@@ -12,6 +13,7 @@ public abstract class X25519Field {
             z[i] = x[i] + y[i];
         }
     }
+
     public static void addOne(int[] z) {
         z[0] += 1;
     }
@@ -23,6 +25,7 @@ public abstract class X25519Field {
             zm[i] = xi - yi;
         }
     }
+
     public static void carry(int[] z) {
         int z0 = z[0], z1 = z[1], z2 = z[2], z3 = z[3], z4 = z[4];
         int z5 = z[5], z6 = z[6], z7 = z[7], z8 = z[8], z9 = z[9];
@@ -66,6 +69,7 @@ public abstract class X25519Field {
         z[8] = z8;
         z[9] = z9;
     }
+
     public static void cmov(int cond, int[] x, int xOff, int[] z, int zOff) {
 //        assert 0 == cond || -1 == cond;
         for (int i = 0; i < SIZE; ++i) {
@@ -74,6 +78,7 @@ public abstract class X25519Field {
             z[zOff + i] = z_i;
         }
     }
+
     public static void cnegate(int negate, int[] z) {
 //      assert negate >>> 1 == 0;
         int mask = 0 - negate;
@@ -81,17 +86,21 @@ public abstract class X25519Field {
             z[i] = (z[i] ^ mask) - mask;
         }
     }
+
     public static void copy(int[] x, int xOff, int[] z, int zOff) {
         for (int i = 0; i < SIZE; ++i) {
             z[zOff + i] = x[xOff + i];
         }
     }
+
     public static int[] create() {
         return new int[SIZE];
     }
+
     public static int[] createTable(int n) {
         return new int[SIZE * n];
     }
+
     public static void cswap(int swap, int[] a, int[] b) {
 //        assert swap >>> 1 == 0;
 //        assert a != b;
@@ -103,11 +112,13 @@ public abstract class X25519Field {
             b[i] = bi ^ dummy;
         }
     }
+
     public static void decode(byte[] x, int xOff, int[] z) {
         decode128(x, xOff, z, 0);
         decode128(x, xOff + 16, z, 5);
         z[9] &= M24;
     }
+
     private static void decode128(byte[] bs, int off, int[] z, int zOff) {
         int t0 = decode32(bs, off + 0);
         int t1 = decode32(bs, off + 4);
@@ -119,6 +130,7 @@ public abstract class X25519Field {
         z[zOff + 3] = ((t3 << 19) | (t2 >>> 13)) & M26;
         z[zOff + 4] = t3 >>> 7;
     }
+
     private static int decode32(byte[] bs, int off) {
         int n = bs[off] & 0xFF;
         n |= (bs[++off] & 0xFF) << 8;
@@ -126,10 +138,12 @@ public abstract class X25519Field {
         n |= bs[++off] << 24;
         return n;
     }
+
     public static void encode(int[] x, byte[] z, int zOff) {
         encode128(x, 0, z, zOff);
         encode128(x, 5, z, zOff + 16);
     }
+
     private static void encode128(int[] x, int xOff, byte[] bs, int off) {
         int x0 = x[xOff + 0], x1 = x[xOff + 1], x2 = x[xOff + 2], x3 = x[xOff + 3], x4 = x[xOff + 4];
         int t0 = x0 | (x1 << 26);
@@ -141,12 +155,14 @@ public abstract class X25519Field {
         int t3 = (x3 >>> 19) | (x4 << 7);
         encode32(t3, bs, off + 12);
     }
+
     private static void encode32(int n, byte[] bs, int off) {
         bs[off] = (byte) (n);
         bs[++off] = (byte) (n >>> 8);
         bs[++off] = (byte) (n >>> 16);
         bs[++off] = (byte) (n >>> 24);
     }
+
     public static void inv(int[] x, int[] z) {
         // z = x^(p-2) = x^7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEB
         // (250 1s) (1 0s) (1 1s) (1 0s) (2 1s)
@@ -157,6 +173,7 @@ public abstract class X25519Field {
         sqr(t, 3, t);
         mul(t, x2, z);
     }
+
     public static int isZero(int[] x) {
         int d = 0;
         for (int i = 0; i < SIZE; ++i) {
@@ -165,6 +182,7 @@ public abstract class X25519Field {
         d = (d >>> 1) | (d & 1);
         return (d - 1) >> 31;
     }
+
     public static boolean isZeroVar(int[] x) {
         return 0 != isZero(x);
     }
@@ -330,23 +348,27 @@ public abstract class X25519Field {
         t >>= 26;
         z[9] = z9 + (int) t;
     }
+
     public static void negate(int[] x, int[] z) {
         for (int i = 0; i < SIZE; ++i) {
             z[i] = -x[i];
         }
     }
+
     public static void normalize(int[] z) {
         int x = ((z[9] >>> 23) & 1);
         reduce(z, x);
         reduce(z, -x);
 //        assert z[9] >>> 24 == 0;
     }
+
     public static void one(int[] z) {
         z[0] = 1;
         for (int i = 1; i < SIZE; ++i) {
             z[i] = 0;
         }
     }
+
     private static void powPm5d8(int[] x, int[] rx2, int[] rz) {
         // z = x^((p-5)/8) = x^FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD
         // (250 1s) (1 0s) (1 1s)
@@ -385,6 +407,7 @@ public abstract class X25519Field {
         sqr(x250, 2, t);
         mul(t, x, rz);
     }
+
     private static void reduce(int[] z, int x) {
         int t = z[9], z9 = t & M24;
         t = (t >> 24) + x;
@@ -418,6 +441,7 @@ public abstract class X25519Field {
         cc >>= 26;
         z[9] = z9 + (int) cc;
     }
+
     public static void sqr(int[] x, int[] z) {
         int x0 = x[0];
         int x1 = x[1];
@@ -541,6 +565,7 @@ public abstract class X25519Field {
         t >>= 26;
         z[9] = z9 + (int) t;
     }
+
     public static void sqr(int[] x, int n, int[] z) {
 //        assert n > 0;
         sqr(x, z);
@@ -548,6 +573,7 @@ public abstract class X25519Field {
             sqr(z, z);
         }
     }
+
     public static boolean sqrtRatioVar(int[] u, int[] v, int[] z) {
         int[] uv3 = create();
         int[] uv7 = create();
@@ -577,14 +603,17 @@ public abstract class X25519Field {
         }
         return false;
     }
+
     public static void sub(int[] x, int[] y, int[] z) {
         for (int i = 0; i < SIZE; ++i) {
             z[i] = x[i] - y[i];
         }
     }
+
     public static void subOne(int[] z) {
         z[0] -= 1;
     }
+
     public static void zero(int[] z) {
         for (int i = 0; i < SIZE; ++i) {
             z[i] = 0;

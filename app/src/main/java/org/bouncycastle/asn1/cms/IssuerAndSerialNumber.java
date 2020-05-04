@@ -1,7 +1,5 @@
 package org.bouncycastle.asn1.cms;
 
-import java.math.BigInteger;
-
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Object;
@@ -12,6 +10,8 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.X509CertificateStructure;
 import org.bouncycastle.asn1.x509.X509Name;
+
+import java.math.BigInteger;
 
 /**
  * <a href="http://tools.ietf.org/html/rfc5652#section-10.2.4">RFC 5652</a>: IssuerAndSerialNumber object.
@@ -26,10 +26,9 @@ import org.bouncycastle.asn1.x509.X509Name;
  * </pre>
  */
 public class IssuerAndSerialNumber
-    extends ASN1Object
-{
-    private X500Name    name;
-    private ASN1Integer  serialNumber;
+        extends ASN1Object {
+    private X500Name name;
+    private ASN1Integer serialNumber;
 
     /**
      * Return an IssuerAndSerialNumber object from the given object.
@@ -42,17 +41,13 @@ public class IssuerAndSerialNumber
      * </ul>
      *
      * @param obj the object we want converted.
-     * @exception IllegalArgumentException if the object cannot be converted.
+     * @throws IllegalArgumentException if the object cannot be converted.
      */
     public static IssuerAndSerialNumber getInstance(
-        Object  obj)
-    {
-        if (obj instanceof IssuerAndSerialNumber)
-        {
-            return (IssuerAndSerialNumber)obj;
-        }
-        else if (obj != null)
-        {
+            Object obj) {
+        if (obj instanceof IssuerAndSerialNumber) {
+            return (IssuerAndSerialNumber) obj;
+        } else if (obj != null) {
             return new IssuerAndSerialNumber(ASN1Sequence.getInstance(obj));
         }
 
@@ -60,18 +55,16 @@ public class IssuerAndSerialNumber
     }
 
     /**
-     * @deprecated  use getInstance() method.
+     * @deprecated use getInstance() method.
      */
     public IssuerAndSerialNumber(
-        ASN1Sequence    seq)
-    {
+            ASN1Sequence seq) {
         this.name = X500Name.getInstance(seq.getObjectAt(0));
-        this.serialNumber = (ASN1Integer)seq.getObjectAt(1);
+        this.serialNumber = (ASN1Integer) seq.getObjectAt(1);
     }
 
     public IssuerAndSerialNumber(
-        Certificate certificate)
-    {
+            Certificate certificate) {
         this.name = certificate.getIssuer();
         this.serialNumber = certificate.getSerialNumber();
     }
@@ -80,27 +73,18 @@ public class IssuerAndSerialNumber
      * @deprecated use constructor taking Certificate
      */
     public IssuerAndSerialNumber(
-        X509CertificateStructure certificate)
-    {
+            X509CertificateStructure certificate) {
         this.name = certificate.getIssuer();
         this.serialNumber = certificate.getSerialNumber();
     }
 
-    public IssuerAndSerialNumber(
-        X500Name name,
-        BigInteger  serialNumber)
-    {
-        this.name = name;
-        this.serialNumber = new ASN1Integer(serialNumber);
-    }
 
     /**
      * @deprecated use X500Name constructor
      */
     public IssuerAndSerialNumber(
-        X509Name    name,
-        BigInteger  serialNumber)
-    {
+            X509Name name,
+            BigInteger serialNumber) {
         this.name = X500Name.getInstance(name);
         this.serialNumber = new ASN1Integer(serialNumber);
     }
@@ -109,25 +93,21 @@ public class IssuerAndSerialNumber
      * @deprecated use X500Name constructor
      */
     public IssuerAndSerialNumber(
-        X509Name    name,
-        ASN1Integer  serialNumber)
-    {
+            X509Name name,
+            ASN1Integer serialNumber) {
         this.name = X500Name.getInstance(name);
         this.serialNumber = serialNumber;
     }
 
-    public X500Name getName()
-    {
+    public X500Name getName() {
         return name;
     }
 
-    public ASN1Integer getSerialNumber()
-    {
+    public ASN1Integer getSerialNumber() {
         return serialNumber;
     }
 
-    public ASN1Primitive toASN1Primitive()
-    {
+    public ASN1Primitive toASN1Primitive() {
         ASN1EncodableVector v = new ASN1EncodableVector(2);
 
         v.add(name);

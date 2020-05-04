@@ -6,8 +6,7 @@ import java.io.IOException;
  * Parser DER EXTERNAL tagged objects.
  */
 public class DERExternalParser
-    implements ASN1Encodable, InMemoryRepresentable
-{
+        implements ASN1Encodable, InMemoryRepresentable {
     private ASN1StreamParser _parser;
 
     /**
@@ -15,16 +14,10 @@ public class DERExternalParser
      *
      * @param parser the underlying parser to read the DER EXTERNAL from.
      */
-    public DERExternalParser(ASN1StreamParser parser)
-    {
+    public DERExternalParser(ASN1StreamParser parser) {
         this._parser = parser;
     }
 
-    public ASN1Encodable readObject()
-        throws IOException
-    {
-        return _parser.readObject();
-    }
 
     /**
      * Return an in-memory, encodable, representation of the EXTERNAL object.
@@ -33,14 +26,10 @@ public class DERExternalParser
      * @throws IOException if there is an issue loading the data.
      */
     public ASN1Primitive getLoadedObject()
-        throws IOException
-    {
-        try
-        {
+            throws IOException {
+        try {
             return new DLExternal(_parser.readVector());
-        }
-        catch (IllegalArgumentException e)
-        {
+        } catch (IllegalArgumentException e) {
             throw new ASN1Exception(e.getMessage(), e);
         }
     }
@@ -50,18 +39,12 @@ public class DERExternalParser
      *
      * @return an DERExternal
      */
-    public ASN1Primitive toASN1Primitive()
-    {
-        try
-        {
+    public ASN1Primitive toASN1Primitive() {
+        try {
             return getLoadedObject();
-        }
-        catch (IOException ioe)
-        {
+        } catch (IOException ioe) {
             throw new ASN1ParsingException("unable to get DER object", ioe);
-        }
-        catch (IllegalArgumentException ioe)
-        {
+        } catch (IllegalArgumentException ioe) {
             throw new ASN1ParsingException("unable to get DER object", ioe);
         }
     }

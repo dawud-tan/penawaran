@@ -149,56 +149,6 @@ public abstract class ASN1External
     }
 
     /**
-     * Returns the data value descriptor
-     *
-     * @return The descriptor
-     */
-    public ASN1Primitive getDataValueDescriptor() {
-        return dataValueDescriptor;
-    }
-
-    /**
-     * Returns the direct reference of the external element
-     *
-     * @return The reference
-     */
-    public ASN1ObjectIdentifier getDirectReference() {
-        return directReference;
-    }
-
-    /**
-     * Returns the encoding of the content. Valid values are
-     * <ul>
-     * <li><code>0</code> single-ASN1-type</li>
-     * <li><code>1</code> OCTET STRING</li>
-     * <li><code>2</code> BIT STRING</li>
-     * </ul>
-     *
-     * @return The encoding
-     */
-    public int getEncoding() {
-        return encoding;
-    }
-
-    /**
-     * Returns the content of this element
-     *
-     * @return The content
-     */
-    public ASN1Primitive getExternalContent() {
-        return externalContent;
-    }
-
-    /**
-     * Returns the indirect reference of this element
-     *
-     * @return The reference
-     */
-    public ASN1Integer getIndirectReference() {
-        return indirectReference;
-    }
-
-    /**
      * Sets the data value descriptor
      *
      * @param dataValueDescriptor The descriptor

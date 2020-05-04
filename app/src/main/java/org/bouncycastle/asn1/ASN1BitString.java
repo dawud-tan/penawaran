@@ -140,22 +140,6 @@ public abstract class ASN1BitString
     }
 
     /**
-     * @return the value of the bit string as an int (truncating if necessary)
-     */
-    public int intValue() {
-        int value = 0;
-        int end = Math.min(4, data.length - 1);
-        for (int i = 0; i < end; ++i) {
-            value |= (data[i] & 0xFF) << (8 * i);
-        }
-        if (0 <= end && end < 4) {
-            byte der = (byte) (data[end] & (0xFF << padBits));
-            value |= (der & 0xFF) << (8 * end);
-        }
-        return value;
-    }
-
-    /**
      * Return the octets contained in this BIT STRING, checking that this BIT STRING really
      * does represent an octet aligned string. Only use this method when the standard you are
      * following dictates that the BIT STRING will be octet aligned.

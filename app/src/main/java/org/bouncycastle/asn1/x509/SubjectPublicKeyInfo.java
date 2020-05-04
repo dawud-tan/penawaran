@@ -24,12 +24,6 @@ public class SubjectPublicKeyInfo
     private DERBitString keyData;
 
     public static SubjectPublicKeyInfo getInstance(
-            ASN1TaggedObject obj,
-            boolean explicit) {
-        return getInstance(ASN1Sequence.getInstance(obj, explicit));
-    }
-
-    public static SubjectPublicKeyInfo getInstance(
             Object obj) {
         if (obj instanceof SubjectPublicKeyInfo) {
             return (SubjectPublicKeyInfo) obj;

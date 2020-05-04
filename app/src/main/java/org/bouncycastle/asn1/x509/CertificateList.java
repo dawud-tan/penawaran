@@ -1,20 +1,19 @@
 
 package org.bouncycastle.asn1.x509;
 
-import java.util.Enumeration;
-
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DERBitString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.x500.X500Name;
 
+import java.util.Enumeration;
+
 /**
  * PKIX RFC-2459
- *
+ * <p>
  * The X.509 v2 CRL syntax is as follows.  For signature calculation,
  * the data that is to be signed is ASN.1 DER encoded.
  *
@@ -26,30 +25,18 @@ import org.bouncycastle.asn1.x500.X500Name;
  * </pre>
  */
 public class CertificateList
-    extends ASN1Object
-{
-    TBSCertList            tbsCertList;
-    AlgorithmIdentifier    sigAlgId;
-    DERBitString           sig;
-    boolean                isHashCodeSet = false;
-    int                    hashCodeValue;
+        extends ASN1Object {
+    TBSCertList tbsCertList;
+    AlgorithmIdentifier sigAlgId;
+    DERBitString sig;
+    boolean isHashCodeSet = false;
+    int hashCodeValue;
 
     public static CertificateList getInstance(
-        ASN1TaggedObject obj,
-        boolean          explicit)
-    {
-        return getInstance(ASN1Sequence.getInstance(obj, explicit));
-    }
-
-    public static CertificateList getInstance(
-        Object  obj)
-    {
-        if (obj instanceof CertificateList)
-        {
-            return (CertificateList)obj;
-        }
-        else if (obj != null)
-        {
+            Object obj) {
+        if (obj instanceof CertificateList) {
+            return (CertificateList) obj;
+        } else if (obj != null) {
             return new CertificateList(ASN1Sequence.getInstance(obj));
         }
 
@@ -57,71 +44,54 @@ public class CertificateList
     }
 
     /**
-     * @deprecated use getInstance() method.
      * @param seq
+     * @deprecated use getInstance() method.
      */
     public CertificateList(
-        ASN1Sequence seq)
-    {
-        if (seq.size() == 3)
-        {
+            ASN1Sequence seq) {
+        if (seq.size() == 3) {
             tbsCertList = TBSCertList.getInstance(seq.getObjectAt(0));
             sigAlgId = AlgorithmIdentifier.getInstance(seq.getObjectAt(1));
             sig = DERBitString.getInstance(seq.getObjectAt(2));
-        }
-        else
-        {
+        } else {
             throw new IllegalArgumentException("sequence wrong size for CertificateList");
         }
     }
 
-    public TBSCertList getTBSCertList()
-    {
+    public TBSCertList getTBSCertList() {
         return tbsCertList;
     }
 
-    public TBSCertList.CRLEntry[] getRevokedCertificates()
-    {
-        return tbsCertList.getRevokedCertificates();
-    }
 
-    public Enumeration getRevokedCertificateEnumeration()
-    {
+    public Enumeration getRevokedCertificateEnumeration() {
         return tbsCertList.getRevokedCertificateEnumeration();
     }
 
-    public AlgorithmIdentifier getSignatureAlgorithm()
-    {
+    public AlgorithmIdentifier getSignatureAlgorithm() {
         return sigAlgId;
     }
 
-    public DERBitString getSignature()
-    {
+    public DERBitString getSignature() {
         return sig;
     }
 
-    public int getVersionNumber()
-    {
+    public int getVersionNumber() {
         return tbsCertList.getVersionNumber();
     }
 
-    public X500Name getIssuer()
-    {
+    public X500Name getIssuer() {
         return tbsCertList.getIssuer();
     }
 
-    public Time getThisUpdate()
-    {
+    public Time getThisUpdate() {
         return tbsCertList.getThisUpdate();
     }
 
-    public Time getNextUpdate()
-    {
+    public Time getNextUpdate() {
         return tbsCertList.getNextUpdate();
     }
 
-    public ASN1Primitive toASN1Primitive()
-    {
+    public ASN1Primitive toASN1Primitive() {
         ASN1EncodableVector v = new ASN1EncodableVector(3);
 
         v.add(tbsCertList);
@@ -131,10 +101,8 @@ public class CertificateList
         return new DERSequence(v);
     }
 
-    public int hashCode()
-    {
-        if (!isHashCodeSet)
-        {
+    public int hashCode() {
+        if (!isHashCodeSet) {
             hashCodeValue = super.hashCode();
             isHashCodeSet = true;
         }

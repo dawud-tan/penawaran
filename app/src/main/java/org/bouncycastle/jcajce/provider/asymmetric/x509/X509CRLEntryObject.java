@@ -1,18 +1,13 @@
 package org.bouncycastle.jcajce.provider.asymmetric.x509;
 
 import org.bouncycastle.asn1.ASN1Encoding;
-import org.bouncycastle.asn1.ASN1Enumerated;
-import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.util.ASN1Dump;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.CRLReason;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.TBSCertList;
-import org.bouncycastle.util.Strings;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -216,47 +211,6 @@ class X509CRLEntryObject extends X509CRLEntry {
     }
 
     public String toString() {
-        StringBuffer buf = new StringBuffer();
-        String nl = Strings.lineSeparator();
-
-        buf.append("      userCertificate: ").append(this.getSerialNumber()).append(nl);
-        buf.append("       revocationDate: ").append(this.getRevocationDate()).append(nl);
-        buf.append("       certificateIssuer: ").append(this.getCertificateIssuer()).append(nl);
-
-        Extensions extensions = c.getExtensions();
-
-        if (extensions != null) {
-            Enumeration e = extensions.oids();
-            if (e.hasMoreElements()) {
-                buf.append("   crlEntryExtensions:").append(nl);
-
-                while (e.hasMoreElements()) {
-                    ASN1ObjectIdentifier oid = (ASN1ObjectIdentifier) e.nextElement();
-                    Extension ext = extensions.getExtension(oid);
-                    if (ext.getExtnValue() != null) {
-                        byte[] octs = ext.getExtnValue().getOctets();
-                        ASN1InputStream dIn = new ASN1InputStream(octs);
-                        buf.append("                       critical(").append(ext.isCritical()).append(") ");
-                        try {
-                            if (oid.equals(Extension.reasonCode)) {
-                                buf.append(CRLReason.getInstance(ASN1Enumerated.getInstance(dIn.readObject()))).append(nl);
-                            } else if (oid.equals(Extension.certificateIssuer)) {
-                                buf.append("Certificate issuer: ").append(GeneralNames.getInstance(dIn.readObject())).append(nl);
-                            } else {
-                                buf.append(oid.getId());
-                                buf.append(" value = ").append(ASN1Dump.dumpAsString(dIn.readObject())).append(nl);
-                            }
-                        } catch (Exception ex) {
-                            buf.append(oid.getId());
-                            buf.append(" value = ").append("*****").append(nl);
-                        }
-                    } else {
-                        buf.append(nl);
-                    }
-                }
-            }
-        }
-
-        return buf.toString();
+        return X509CRLEntryObject.class.getCanonicalName();
     }
 }

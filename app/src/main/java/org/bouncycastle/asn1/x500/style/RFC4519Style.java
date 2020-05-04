@@ -203,22 +203,7 @@ public class RFC4519Style
 
     // convert in reverse
     public String toString(X500Name name) {
-        StringBuffer buf = new StringBuffer();
-        boolean first = true;
-
-        RDN[] rdns = name.getRDNs();
-
-        for (int i = rdns.length - 1; i >= 0; i--) {
-            if (first) {
-                first = false;
-            } else {
-                buf.append(',');
-            }
-
-            IETFUtils.appendRDN(buf, rdns[i], defaultSymbols);
-        }
-
-        return buf.toString();
+        return RFC4519Style.class.getCanonicalName();
     }
 
 

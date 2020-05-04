@@ -38,28 +38,6 @@ public class ASN1Enumerated
     }
 
     /**
-     * return an Enumerated from a tagged object.
-     *
-     * @param obj      the tagged object holding the object we want
-     * @param explicit true if the object is meant to be explicitly
-     *                 tagged false otherwise.
-     * @return an ASN1Enumerated instance, or null.
-     * @throws IllegalArgumentException if the tagged object cannot
-     *                                  be converted.
-     */
-    public static ASN1Enumerated getInstance(
-            ASN1TaggedObject obj,
-            boolean explicit) {
-        ASN1Primitive o = obj.getObject();
-
-        if (explicit || o instanceof ASN1Enumerated) {
-            return getInstance(o);
-        } else {
-            return fromOctetString(ASN1OctetString.getInstance(o).getOctets());
-        }
-    }
-
-    /**
      * Constructor from int.
      *
      * @param value the value of this enumerated.
@@ -104,18 +82,6 @@ public class ASN1Enumerated
         this.start = ASN1Integer.signBytesToSkip(bytes);
     }
 
-    public BigInteger getValue() {
-        return new BigInteger(bytes);
-    }
-
-    public int intValueExact() {
-        int count = bytes.length - start;
-        if (count > 4) {
-            throw new ArithmeticException("ASN.1 Enumerated out of int range");
-        }
-
-        return ASN1Integer.intValue(bytes, start, ASN1Integer.SIGN_EXT_SIGNED);
-    }
 
     boolean isConstructed() {
         return false;

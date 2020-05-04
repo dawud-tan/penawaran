@@ -1,11 +1,8 @@
 package org.bouncycastle.asn1.cms;
 
-import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.DLSet;
 
 /**
  * <a href="http://tools.ietf.org/html/rfc5652">RFC 5652</a> defines
@@ -30,10 +27,6 @@ public class Attributes
         attributes = set;
     }
 
-    public Attributes(ASN1EncodableVector v) {
-        attributes = new DLSet(v);
-    }
-
     /**
      * Return an Attribute set object from the given object.
      * <p>
@@ -55,12 +48,6 @@ public class Attributes
         }
 
         return null;
-    }
-
-    public static Attributes getInstance(
-            ASN1TaggedObject obj,
-            boolean explicit) {
-        return getInstance(ASN1Set.getInstance(obj, explicit));
     }
 
 

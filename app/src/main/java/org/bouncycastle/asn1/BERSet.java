@@ -17,13 +17,11 @@ import java.io.IOException;
  * </p>
  */
 public class BERSet
-    extends ASN1Set
-{
+        extends ASN1Set {
     /**
      * Create an empty SET.
      */
-    public BERSet()
-    {
+    public BERSet() {
     }
 
     /**
@@ -31,41 +29,29 @@ public class BERSet
      *
      * @param element - a single object that makes up the set.
      */
-    public BERSet(ASN1Encodable element)
-    {
+    public BERSet(ASN1Encodable element) {
         super(element);
     }
 
     /**
      * Create a SET containing multiple objects.
+     *
      * @param elementVector a vector of objects making up the set.
      */
-    public BERSet(ASN1EncodableVector elementVector)
-    {
+    public BERSet(ASN1EncodableVector elementVector) {
         super(elementVector, false);
     }
 
-    /**
-     * Create a SET from an array of objects.
-     * @param elements an array of ASN.1 objects.
-     */
-    public BERSet(ASN1Encodable[] elements)
-    {
-        super(elements, false);
-    }
 
-    BERSet(boolean isSorted, ASN1Encodable[] elements)
-    {
+    BERSet(boolean isSorted, ASN1Encodable[] elements) {
         super(isSorted, elements);
     }
 
-    int encodedLength() throws IOException
-    {
+    int encodedLength() throws IOException {
         int count = elements.length;
         int totalLength = 0;
 
-        for (int i = 0; i < count; ++i)
-        {
+        for (int i = 0; i < count; ++i) {
             ASN1Primitive p = elements[i].toASN1Primitive();
             totalLength += p.encodedLength();
         }
@@ -73,8 +59,7 @@ public class BERSet
         return 2 + totalLength + 2;
     }
 
-    void encode(ASN1OutputStream out, boolean withTag) throws IOException
-    {
+    void encode(ASN1OutputStream out, boolean withTag) throws IOException {
         out.writeEncodedIndef(withTag, BERTags.SET | BERTags.CONSTRUCTED, elements);
     }
 }

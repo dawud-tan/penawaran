@@ -20,10 +20,6 @@ public final class Arrays {
         return java.util.Arrays.equals(a, b);
     }
 
-    public static boolean areEqual(int[] a, int[] b) {
-        return java.util.Arrays.equals(a, b);
-    }
-
 
     /**
      * A constant time equals comparison - does not terminate early if
@@ -140,52 +136,12 @@ public final class Arrays {
         return hc;
     }
 
-    public static int hashCode(int[] data) {
-        if (data == null) {
-            return 0;
-        }
-
-        int i = data.length;
-        int hc = i + 1;
-
-        while (--i >= 0) {
-            hc *= 257;
-            hc ^= data[i];
-        }
-
-        return hc;
-    }
-
-    public static int hashCode(int[] data, int off, int len) {
-        if (data == null) {
-            return 0;
-        }
-
-        int i = len;
-        int hc = i + 1;
-
-        while (--i >= 0) {
-            hc *= 257;
-            hc ^= data[off + i];
-        }
-
-        return hc;
-    }
 
     public static boolean[] clone(boolean[] data) {
         return null == data ? null : data.clone();
     }
 
     public static byte[] clone(byte[] data) {
-        return null == data ? null : data.clone();
-    }
-
-
-    public static int[] clone(int[] data) {
-        return null == data ? null : data.clone();
-    }
-
-    public static long[] clone(long[] data) {
         return null == data ? null : data.clone();
     }
 

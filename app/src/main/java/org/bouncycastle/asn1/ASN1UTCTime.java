@@ -34,30 +34,6 @@ public class ASN1UTCTime
         extends ASN1Primitive {
     private byte[] time;
 
-    /**
-     * Return an UTC Time from the passed in object.
-     *
-     * @param obj an ASN1UTCTime or an object that can be converted into one.
-     * @return an ASN1UTCTime instance, or null.
-     * @throws IllegalArgumentException if the object cannot be converted.
-     */
-    public static ASN1UTCTime getInstance(
-            Object obj) {
-        if (obj == null || obj instanceof ASN1UTCTime) {
-            return (ASN1UTCTime) obj;
-        }
-
-        if (obj instanceof byte[]) {
-            try {
-                return (ASN1UTCTime) fromByteArray((byte[]) obj);
-            } catch (Exception e) {
-                throw new IllegalArgumentException("encoding error in getInstance: " + e.toString());
-            }
-        }
-
-        throw new IllegalArgumentException("illegal object in getInstance: " + obj.getClass().getName());
-    }
-
 
     /**
      * The correct format for this is YYMMDDHHMMSSZ (it used to be that seconds were

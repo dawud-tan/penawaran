@@ -1,19 +1,18 @@
 package org.bouncycastle.asn1;
 
+import org.bouncycastle.util.Arrays;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.bouncycastle.util.Arrays;
-
 /**
  * Class representing the ASN.1 OBJECT IDENTIFIER type.
  */
 public class ASN1ObjectIdentifier
-    extends ASN1Primitive
-{
+        extends ASN1Primitive {
     private final String identifier;
 
     private byte[] body;
@@ -26,32 +25,24 @@ public class ASN1ObjectIdentifier
      * @throws IllegalArgumentException if the object cannot be converted.
      */
     public static ASN1ObjectIdentifier getInstance(
-        Object obj)
-    {
-        if (obj == null || obj instanceof ASN1ObjectIdentifier)
-        {
-            return (ASN1ObjectIdentifier)obj;
+            Object obj) {
+        if (obj == null || obj instanceof ASN1ObjectIdentifier) {
+            return (ASN1ObjectIdentifier) obj;
         }
 
-        if (obj instanceof ASN1Encodable)
-        {
-            ASN1Primitive primitive = ((ASN1Encodable)obj).toASN1Primitive();
+        if (obj instanceof ASN1Encodable) {
+            ASN1Primitive primitive = ((ASN1Encodable) obj).toASN1Primitive();
 
-            if (primitive instanceof ASN1ObjectIdentifier)
-            {
-                return (ASN1ObjectIdentifier)primitive;
+            if (primitive instanceof ASN1ObjectIdentifier) {
+                return (ASN1ObjectIdentifier) primitive;
             }
         }
 
-        if (obj instanceof byte[])
-        {
-            byte[] enc = (byte[])obj;
-            try
-            {
-                return (ASN1ObjectIdentifier)fromByteArray(enc);
-            }
-            catch (IOException e)
-            {
+        if (obj instanceof byte[]) {
+            byte[] enc = (byte[]) obj;
+            try {
+                return (ASN1ObjectIdentifier) fromByteArray(enc);
+            } catch (IOException e) {
                 throw new IllegalArgumentException("failed to construct object identifier from byte[]: " + e.getMessage());
             }
         }
@@ -67,20 +58,16 @@ public class ASN1ObjectIdentifier
      *                 tagged false otherwise.
      * @return an ASN1ObjectIdentifier instance, or null.
      * @throws IllegalArgumentException if the tagged object cannot
-     * be converted.
+     *                                  be converted.
      */
     public static ASN1ObjectIdentifier getInstance(
-        ASN1TaggedObject obj,
-        boolean explicit)
-    {
+            ASN1TaggedObject obj,
+            boolean explicit) {
         ASN1Primitive o = obj.getObject();
 
-        if (explicit || o instanceof ASN1ObjectIdentifier)
-        {
+        if (explicit || o instanceof ASN1ObjectIdentifier) {
             return getInstance(o);
-        }
-        else
-        {
+        } else {
             return ASN1ObjectIdentifier.fromOctetString(ASN1OctetString.getInstance(o).getOctets());
         }
     }
@@ -88,35 +75,26 @@ public class ASN1ObjectIdentifier
     private static final long LONG_LIMIT = (Long.MAX_VALUE >> 7) - 0x7f;
 
     ASN1ObjectIdentifier(
-        byte[] bytes)
-    {
+            byte[] bytes) {
         StringBuffer objId = new StringBuffer();
         long value = 0;
         BigInteger bigValue = null;
         boolean first = true;
 
-        for (int i = 0; i != bytes.length; i++)
-        {
+        for (int i = 0; i != bytes.length; i++) {
             int b = bytes[i] & 0xff;
 
-            if (value <= LONG_LIMIT)
-            {
+            if (value <= LONG_LIMIT) {
                 value += (b & 0x7f);
                 if ((b & 0x80) == 0)             // end of number reached
                 {
-                    if (first)
-                    {
-                        if (value < 40)
-                        {
+                    if (first) {
+                        if (value < 40) {
                             objId.append('0');
-                        }
-                        else if (value < 80)
-                        {
+                        } else if (value < 80) {
                             objId.append('1');
                             value -= 40;
-                        }
-                        else
-                        {
+                        } else {
                             objId.append('2');
                             value -= 80;
                         }
@@ -126,23 +104,16 @@ public class ASN1ObjectIdentifier
                     objId.append('.');
                     objId.append(value);
                     value = 0;
-                }
-                else
-                {
+                } else {
                     value <<= 7;
                 }
-            }
-            else
-            {
-                if (bigValue == null)
-                {
+            } else {
+                if (bigValue == null) {
                     bigValue = BigInteger.valueOf(value);
                 }
                 bigValue = bigValue.or(BigInteger.valueOf(b & 0x7f));
-                if ((b & 0x80) == 0)
-                {
-                    if (first)
-                    {
+                if ((b & 0x80) == 0) {
+                    if (first) {
                         objId.append('2');
                         bigValue = bigValue.subtract(BigInteger.valueOf(80));
                         first = false;
@@ -152,9 +123,7 @@ public class ASN1ObjectIdentifier
                     objId.append(bigValue);
                     bigValue = null;
                     value = 0;
-                }
-                else
-                {
+                } else {
                     bigValue = bigValue.shiftLeft(7);
                 }
             }
@@ -170,14 +139,11 @@ public class ASN1ObjectIdentifier
      * @param identifier a string representation of an OID.
      */
     public ASN1ObjectIdentifier(
-        String identifier)
-    {
-        if (identifier == null)
-        {
+            String identifier) {
+        if (identifier == null) {
             throw new NullPointerException("'identifier' cannot be null");
         }
-        if (!isValidIdentifier(identifier))
-        {
+        if (!isValidIdentifier(identifier)) {
             throw new IllegalArgumentException("string " + identifier + " not an OID");
         }
 
@@ -190,10 +156,8 @@ public class ASN1ObjectIdentifier
      * @param branchID node numbers for the new branch.
      * @return the OID for the new created branch.
      */
-    ASN1ObjectIdentifier(ASN1ObjectIdentifier oid, String branchID)
-    {
-        if (!isValidBranchID(branchID, 0))
-        {
+    ASN1ObjectIdentifier(ASN1ObjectIdentifier oid, String branchID) {
+        if (!isValidBranchID(branchID, 0)) {
             throw new IllegalArgumentException("string " + branchID + " not a valid OID branch");
         }
 
@@ -205,8 +169,7 @@ public class ASN1ObjectIdentifier
      *
      * @return the string representation of the OID carried by this object.
      */
-    public String getId()
-    {
+    public String getId() {
         return identifier;
     }
 
@@ -216,54 +179,34 @@ public class ASN1ObjectIdentifier
      * @param branchID node numbers for the new branch.
      * @return the OID for the new created branch.
      */
-    public ASN1ObjectIdentifier branch(String branchID)
-    {
+    public ASN1ObjectIdentifier branch(String branchID) {
         return new ASN1ObjectIdentifier(this, branchID);
     }
 
-    /**
-     * Return true if this oid is an extension of the passed in branch - stem.
-     *
-     * @param stem the arc or branch that is a possible parent.
-     * @return true if the branch is on the passed in stem, false otherwise.
-     */
-    public boolean on(ASN1ObjectIdentifier stem)
-    {
-        String id = getId(), stemId = stem.getId();
-        return id.length() > stemId.length() && id.charAt(stemId.length()) == '.' && id.startsWith(stemId);
-    }
-
     private void writeField(
-        ByteArrayOutputStream out,
-        long fieldValue)
-    {
+            ByteArrayOutputStream out,
+            long fieldValue) {
         byte[] result = new byte[9];
         int pos = 8;
-        result[pos] = (byte)((int)fieldValue & 0x7f);
-        while (fieldValue >= (1L << 7))
-        {
+        result[pos] = (byte) ((int) fieldValue & 0x7f);
+        while (fieldValue >= (1L << 7)) {
             fieldValue >>= 7;
-            result[--pos] = (byte)((int)fieldValue & 0x7f | 0x80);
+            result[--pos] = (byte) ((int) fieldValue & 0x7f | 0x80);
         }
         out.write(result, pos, 9 - pos);
     }
 
     private void writeField(
-        ByteArrayOutputStream out,
-        BigInteger fieldValue)
-    {
+            ByteArrayOutputStream out,
+            BigInteger fieldValue) {
         int byteCount = (fieldValue.bitLength() + 6) / 7;
-        if (byteCount == 0)
-        {
+        if (byteCount == 0) {
             out.write(0);
-        }
-        else
-        {
+        } else {
             BigInteger tmpValue = fieldValue;
             byte[] tmp = new byte[byteCount];
-            for (int i = byteCount - 1; i >= 0; i--)
-            {
-                tmp[i] = (byte)((tmpValue.intValue() & 0x7f) | 0x80);
+            for (int i = byteCount - 1; i >= 0; i--) {
+                tmp[i] = (byte) ((tmpValue.intValue() & 0x7f) | 0x80);
                 tmpValue = tmpValue.shiftRight(7);
             }
             tmp[byteCount - 1] &= 0x7f;
@@ -271,39 +214,29 @@ public class ASN1ObjectIdentifier
         }
     }
 
-    private void doOutput(ByteArrayOutputStream aOut)
-    {
+    private void doOutput(ByteArrayOutputStream aOut) {
         OIDTokenizer tok = new OIDTokenizer(identifier);
         int first = Integer.parseInt(tok.nextToken()) * 40;
 
         String secondToken = tok.nextToken();
-        if (secondToken.length() <= 18)
-        {
+        if (secondToken.length() <= 18) {
             writeField(aOut, first + Long.parseLong(secondToken));
-        }
-        else
-        {
+        } else {
             writeField(aOut, new BigInteger(secondToken).add(BigInteger.valueOf(first)));
         }
 
-        while (tok.hasMoreTokens())
-        {
+        while (tok.hasMoreTokens()) {
             String token = tok.nextToken();
-            if (token.length() <= 18)
-            {
+            if (token.length() <= 18) {
                 writeField(aOut, Long.parseLong(token));
-            }
-            else
-            {
+            } else {
                 writeField(aOut, new BigInteger(token));
             }
         }
     }
 
-    private synchronized byte[] getBody()
-    {
-        if (body == null)
-        {
+    private synchronized byte[] getBody() {
+        if (body == null) {
             ByteArrayOutputStream bOut = new ByteArrayOutputStream();
 
             doOutput(bOut);
@@ -314,76 +247,60 @@ public class ASN1ObjectIdentifier
         return body;
     }
 
-    boolean isConstructed()
-    {
+    boolean isConstructed() {
         return false;
     }
 
     int encodedLength()
-        throws IOException
-    {
+            throws IOException {
         int length = getBody().length;
 
         return 1 + StreamUtil.calculateBodyLength(length) + length;
     }
 
-    void encode(ASN1OutputStream out, boolean withTag) throws IOException
-    {
+    void encode(ASN1OutputStream out, boolean withTag) throws IOException {
         out.writeEncoded(withTag, BERTags.OBJECT_IDENTIFIER, getBody());
     }
 
-    public int hashCode()
-    {
+    public int hashCode() {
         return identifier.hashCode();
     }
 
     boolean asn1Equals(
-        ASN1Primitive o)
-    {
-        if (o == this)
-        {
+            ASN1Primitive o) {
+        if (o == this) {
             return true;
         }
 
-        if (!(o instanceof ASN1ObjectIdentifier))
-        {
+        if (!(o instanceof ASN1ObjectIdentifier)) {
             return false;
         }
 
-        return identifier.equals(((ASN1ObjectIdentifier)o).identifier);
+        return identifier.equals(((ASN1ObjectIdentifier) o).identifier);
     }
 
-    public String toString()
-    {
+    public String toString() {
         return getId();
     }
 
     private static boolean isValidBranchID(
-        String branchID, int start)
-    {
+            String branchID, int start) {
         int digitCount = 0;
 
         int pos = branchID.length();
-        while (--pos >= start)
-        {
+        while (--pos >= start) {
             char ch = branchID.charAt(pos);
 
-            if (ch == '.')
-            {
+            if (ch == '.') {
                 if (0 == digitCount
-                    || (digitCount > 1 && branchID.charAt(pos + 1) == '0'))
-                {
+                        || (digitCount > 1 && branchID.charAt(pos + 1) == '0')) {
                     return false;
                 }
 
                 digitCount = 0;
-            }
-            else if ('0' <= ch && ch <= '9')
-            {
+            } else if ('0' <= ch && ch <= '9') {
                 ++digitCount;
-            }
-            else
-            {
+            } else {
                 return false;
             }
         }
@@ -393,16 +310,13 @@ public class ASN1ObjectIdentifier
     }
 
     private static boolean isValidIdentifier(
-        String identifier)
-    {
-        if (identifier.length() < 3 || identifier.charAt(1) != '.')
-        {
+            String identifier) {
+        if (identifier.length() < 3 || identifier.charAt(1) != '.') {
             return false;
         }
 
         char first = identifier.charAt(0);
-        if (first < '0' || first > '2')
-        {
+        if (first < '0' || first > '2') {
             return false;
         }
 
@@ -419,15 +333,12 @@ public class ASN1ObjectIdentifier
      *
      * @return a reference to the identifier in the pool.
      */
-    public ASN1ObjectIdentifier intern()
-    {
+    public ASN1ObjectIdentifier intern() {
         final OidHandle hdl = new OidHandle(getBody());
         ASN1ObjectIdentifier oid = pool.get(hdl);
-        if (oid == null)
-        {
+        if (oid == null) {
             oid = pool.putIfAbsent(hdl, this);
-            if (oid == null)
-            {
+            if (oid == null) {
                 oid = this;
             }
         }
@@ -436,39 +347,32 @@ public class ASN1ObjectIdentifier
 
     private static final ConcurrentMap<OidHandle, ASN1ObjectIdentifier> pool = new ConcurrentHashMap<OidHandle, ASN1ObjectIdentifier>();
 
-    private static class OidHandle
-    {
+    private static class OidHandle {
         private final int key;
         private final byte[] enc;
 
-        OidHandle(byte[] enc)
-        {
+        OidHandle(byte[] enc) {
             this.key = Arrays.hashCode(enc);
             this.enc = enc;
         }
 
-        public int hashCode()
-        {
+        public int hashCode() {
             return key;
         }
 
-        public boolean equals(Object o)
-        {
-            if (o instanceof OidHandle)
-            {
-                return Arrays.areEqual(enc, ((OidHandle)o).enc);
+        public boolean equals(Object o) {
+            if (o instanceof OidHandle) {
+                return Arrays.areEqual(enc, ((OidHandle) o).enc);
             }
 
             return false;
         }
     }
 
-    static ASN1ObjectIdentifier fromOctetString(byte[] enc)
-    {
+    static ASN1ObjectIdentifier fromOctetString(byte[] enc) {
         final OidHandle hdl = new OidHandle(enc);
         ASN1ObjectIdentifier oid = pool.get(hdl);
-        if (oid == null)
-        {
+        if (oid == null) {
             return new ASN1ObjectIdentifier(enc);
         }
         return oid;

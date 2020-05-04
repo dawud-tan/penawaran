@@ -10,7 +10,6 @@ import org.bouncycastle.asn1.DERBitString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.util.BigIntegers;
 import org.bouncycastle.util.Properties;
 
 import java.math.BigInteger;
@@ -197,7 +196,7 @@ public class TBSCertificate
         ASN1EncodableVector v = new ASN1EncodableVector();
 
         // DEFAULT Zero
-        if (!version.hasValue(BigIntegers.ZERO)) {
+        if (!version.hasValue(BigInteger.ZERO)) {
             v.add(new DERTaggedObject(true, 0, version));
         }
 

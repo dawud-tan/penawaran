@@ -1,7 +1,5 @@
 package org.bouncycastle.asn1.x500.style;
 
-import java.util.Hashtable;
-
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -13,9 +11,10 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameStyle;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 
+import java.util.Hashtable;
+
 public class BCStyle
-    extends AbstractX500NameStyle
-{
+        extends AbstractX500NameStyle {
     /**
      * country code - StringType(SIZE(2))
      */
@@ -43,6 +42,7 @@ public class BCStyle
 
     /**
      * device serial number name - StringType(SIZE(1..64))
+     *
      * @deprecated use SERIALNUMBER or SURNAME
      */
     public static final ASN1ObjectIdentifier SN = new ASN1ObjectIdentifier("2.5.4.5").intern();
@@ -175,8 +175,8 @@ public class BCStyle
     public static final ASN1ObjectIdentifier E = EmailAddress;
 
     /*
-    * others...
-    */
+     * others...
+     */
     public static final ASN1ObjectIdentifier DC = new ASN1ObjectIdentifier("0.9.2342.19200300.100.1.25");
 
     /**
@@ -195,8 +195,7 @@ public class BCStyle
      */
     private static final Hashtable DefaultLookUp = new Hashtable();
 
-    static
-    {
+    static {
         DefaultSymbols.put(C, "C");
         DefaultSymbols.put(O, "O");
         DefaultSymbols.put(T, "T");
@@ -276,66 +275,44 @@ public class BCStyle
     protected final Hashtable defaultLookUp;
     protected final Hashtable defaultSymbols;
 
-    protected BCStyle()
-    {
+    protected BCStyle() {
         defaultSymbols = copyHashTable(DefaultSymbols);
         defaultLookUp = copyHashTable(DefaultLookUp);
     }
 
     protected ASN1Encodable encodeStringValue(ASN1ObjectIdentifier oid,
-    		String value) {
-    	if (oid.equals(EmailAddress) || oid.equals(DC))
-        {
+                                              String value) {
+        if (oid.equals(EmailAddress) || oid.equals(DC)) {
             return new DERIA5String(value);
-        }
-        else if (oid.equals(DATE_OF_BIRTH))  // accept time string as well as # (for compatibility)
+        } else if (oid.equals(DATE_OF_BIRTH))  // accept time string as well as # (for compatibility)
         {
             return new ASN1GeneralizedTime(value);
-        }
-        else if (oid.equals(C) || oid.equals(SN) || oid.equals(DN_QUALIFIER)
-            || oid.equals(TELEPHONE_NUMBER))
-        {
+        } else if (oid.equals(C) || oid.equals(SN) || oid.equals(DN_QUALIFIER)
+                || oid.equals(TELEPHONE_NUMBER)) {
             return new DERPrintableString(value);
         }
-    	
-    	return super.encodeStringValue(oid, value);
+
+        return super.encodeStringValue(oid, value);
     }
 
-    public String oidToDisplayName(ASN1ObjectIdentifier oid)
-    {
-        return (String)DefaultSymbols.get(oid);
-    }
-
-    public String[] oidToAttrNames(ASN1ObjectIdentifier oid)
-    {
-        return IETFUtils.findAttrNamesForOID(oid, defaultLookUp);
-    }
-
-    public ASN1ObjectIdentifier attrNameToOID(String attrName)
-    {
+    public ASN1ObjectIdentifier attrNameToOID(String attrName) {
         return IETFUtils.decodeAttrName(attrName, defaultLookUp);
     }
 
-    public RDN[] fromString(String dirName)
-    {
+    public RDN[] fromString(String dirName) {
         return IETFUtils.rDNsFromString(dirName, this);
     }
 
-    public String toString(X500Name name)
-    {
+    public String toString(X500Name name) {
         StringBuffer buf = new StringBuffer();
         boolean first = true;
 
         RDN[] rdns = name.getRDNs();
 
-        for (int i = 0; i < rdns.length; i++)
-        {
-            if (first)
-            {
+        for (int i = 0; i < rdns.length; i++) {
+            if (first) {
                 first = false;
-            }
-            else
-            {
+            } else {
                 buf.append(',');
             }
 

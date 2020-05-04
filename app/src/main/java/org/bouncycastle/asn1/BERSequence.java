@@ -11,46 +11,33 @@ import java.io.IOException;
  * </p>
  */
 public class BERSequence
-    extends ASN1Sequence
-{
+        extends ASN1Sequence {
     /**
      * Create an empty sequence
      */
-    public BERSequence()
-    {
+    public BERSequence() {
     }
 
     /**
      * Create a sequence containing one object
      */
-    public BERSequence(ASN1Encodable element)
-    {
+    public BERSequence(ASN1Encodable element) {
         super(element);
     }
 
     /**
      * Create a sequence containing a vector of objects.
      */
-    public BERSequence(ASN1EncodableVector elementVector)
-    {
+    public BERSequence(ASN1EncodableVector elementVector) {
         super(elementVector);
     }
 
-    /**
-     * Create a sequence containing an array of objects.
-     */
-    public BERSequence(ASN1Encodable[] elements)
-    {
-        super(elements);
-    }
 
-    int encodedLength() throws IOException
-    {
+    int encodedLength() throws IOException {
         int count = elements.length;
         int totalLength = 0;
 
-        for (int i = 0; i < count; ++i)
-        {
+        for (int i = 0; i < count; ++i) {
             ASN1Primitive p = elements[i].toASN1Primitive();
             totalLength += p.encodedLength();
         }
@@ -58,8 +45,7 @@ public class BERSequence
         return 2 + totalLength + 2;
     }
 
-    void encode(ASN1OutputStream out, boolean withTag) throws IOException
-    {
+    void encode(ASN1OutputStream out, boolean withTag) throws IOException {
         out.writeEncodedIndef(withTag, BERTags.SEQUENCE | BERTags.CONSTRUCTED, elements);
     }
 }

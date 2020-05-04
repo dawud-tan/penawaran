@@ -1,9 +1,8 @@
 package org.bouncycastle.asn1;
 
-import java.io.IOException;
-import java.util.Date;
-
 import org.bouncycastle.util.Strings;
+
+import java.io.IOException;
 
 /**
  * DER Generalized time object.
@@ -23,102 +22,75 @@ import org.bouncycastle.util.Strings;
  * shall be omitted.
  */
 public class DERGeneralizedTime
-    extends ASN1GeneralizedTime
-{
-    public DERGeneralizedTime(byte[] time)
-    {
+        extends ASN1GeneralizedTime {
+    public DERGeneralizedTime(byte[] time) {
         super(time);
     }
 
-    public DERGeneralizedTime(Date time)
-    {
+    public DERGeneralizedTime(String time) {
         super(time);
     }
 
-    public DERGeneralizedTime(String time)
-    {
-        super(time);
-    }
-
-    private byte[] getDERTime()
-    {
-        if (time[time.length - 1] == 'Z')
-        {
-            if (!hasMinutes())
-            {
+    private byte[] getDERTime() {
+        if (time[time.length - 1] == 'Z') {
+            if (!hasMinutes()) {
                 byte[] derTime = new byte[time.length + 4];
 
                 System.arraycopy(time, 0, derTime, 0, time.length - 1);
                 System.arraycopy(Strings.toByteArray("0000Z"), 0, derTime, time.length - 1, 5);
 
                 return derTime;
-            }
-            else if (!hasSeconds())
-            {
+            } else if (!hasSeconds()) {
                 byte[] derTime = new byte[time.length + 2];
 
                 System.arraycopy(time, 0, derTime, 0, time.length - 1);
                 System.arraycopy(Strings.toByteArray("00Z"), 0, derTime, time.length - 1, 3);
 
                 return derTime;
-            }
-            else if (hasFractionalSeconds())
-            {
+            } else if (hasFractionalSeconds()) {
                 int ind = time.length - 2;
-                while (ind > 0 && time[ind] == '0')
-                {
+                while (ind > 0 && time[ind] == '0') {
                     ind--;
                 }
 
-                if (time[ind] == '.')
-                {
+                if (time[ind] == '.') {
                     byte[] derTime = new byte[ind + 1];
 
                     System.arraycopy(time, 0, derTime, 0, ind);
-                    derTime[ind] = (byte)'Z';
+                    derTime[ind] = (byte) 'Z';
 
                     return derTime;
-                }
-                else
-                {
+                } else {
                     byte[] derTime = new byte[ind + 2];
 
                     System.arraycopy(time, 0, derTime, 0, ind + 1);
-                    derTime[ind + 1] = (byte)'Z';
+                    derTime[ind + 1] = (byte) 'Z';
 
                     return derTime;
                 }
-            }
-            else
-            {
+            } else {
                 return time;
             }
-        }
-        else
-        {
+        } else {
             return time; // TODO: is there a better way?
         }
     }
 
-    int encodedLength()
-    {
+    int encodedLength() {
         int length = getDERTime().length;
 
         return 1 + StreamUtil.calculateBodyLength(length) + length;
     }
 
-    void encode(ASN1OutputStream out, boolean withTag) throws IOException
-    {
+    void encode(ASN1OutputStream out, boolean withTag) throws IOException {
         out.writeEncoded(withTag, BERTags.GENERALIZED_TIME, getDERTime());
     }
 
-    ASN1Primitive toDERObject()
-    {
+    ASN1Primitive toDERObject() {
         return this;
     }
 
-    ASN1Primitive toDLObject()
-    {
+    ASN1Primitive toDLObject() {
         return this;
     }
 }

@@ -127,10 +127,6 @@ public class DERIA5String
         return getString();
     }
 
-    public byte[] getOctets()
-    {
-        return Arrays.clone(string);
-    }
 
     boolean isConstructed()
     {

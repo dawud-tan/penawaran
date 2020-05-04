@@ -18,7 +18,7 @@ import org.bouncycastle.asn1.DERSequence;
  *     attrType OBJECT IDENTIFIER,
  *     attrValues SET OF AttributeValue
  * }
- * 
+ *
  * AttributeValue ::= ANY
  * </pre>
  * <p>
@@ -31,10 +31,9 @@ import org.bouncycastle.asn1.DERSequence;
  * must not have multiple Attribute:s with same attrType (OID) there.
  */
 public class Attribute
-    extends ASN1Object
-{
+        extends ASN1Object {
     private ASN1ObjectIdentifier attrType;
-    private ASN1Set             attrValues;
+    private ASN1Set attrValues;
 
     /**
      * Return an Attribute object from the given object.
@@ -47,59 +46,50 @@ public class Attribute
      * </ul>
      *
      * @param o the object we want converted.
-     * @exception IllegalArgumentException if the object cannot be converted.
+     * @throws IllegalArgumentException if the object cannot be converted.
      */
     public static Attribute getInstance(
-        Object o)
-    {
-        if (o instanceof Attribute)
-        {
-            return (Attribute)o;
+            Object o) {
+        if (o instanceof Attribute) {
+            return (Attribute) o;
         }
-        
-        if (o != null)
-        {
+
+        if (o != null) {
             return new Attribute(ASN1Sequence.getInstance(o));
         }
 
         return null;
     }
-    
+
     private Attribute(
-        ASN1Sequence seq)
-    {
-        attrType = (ASN1ObjectIdentifier)seq.getObjectAt(0);
-        attrValues = (ASN1Set)seq.getObjectAt(1);
+            ASN1Sequence seq) {
+        attrType = (ASN1ObjectIdentifier) seq.getObjectAt(0);
+        attrValues = (ASN1Set) seq.getObjectAt(1);
     }
 
     public Attribute(
-        ASN1ObjectIdentifier attrType,
-        ASN1Set             attrValues)
-    {
+            ASN1ObjectIdentifier attrType,
+            ASN1Set attrValues) {
         this.attrType = attrType;
         this.attrValues = attrValues;
     }
 
-    public ASN1ObjectIdentifier getAttrType()
-    {
+    public ASN1ObjectIdentifier getAttrType() {
         return attrType;
     }
-    
-    public ASN1Set getAttrValues()
-    {
+
+    public ASN1Set getAttrValues() {
         return attrValues;
     }
 
-    public ASN1Encodable[] getAttributeValues()
-    {
+    public ASN1Encodable[] getAttributeValues() {
         return attrValues.toArray();
     }
 
-    /** 
+    /**
      * Produce an object suitable for an ASN1OutputStream.
      */
-    public ASN1Primitive toASN1Primitive()
-    {
+    public ASN1Primitive toASN1Primitive() {
         ASN1EncodableVector v = new ASN1EncodableVector(2);
 
         v.add(attrType);

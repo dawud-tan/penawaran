@@ -4,27 +4,16 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.BEROctetStringGenerator;
 import org.bouncycastle.asn1.BERSet;
 import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.DERTaggedObject;
-import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
 import org.bouncycastle.asn1.cms.ContentInfo;
-import org.bouncycastle.asn1.cms.OtherRevocationInfoFormat;
-import org.bouncycastle.asn1.ocsp.OCSPResponse;
-import org.bouncycastle.asn1.ocsp.OCSPResponseStatus;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.cert.X509AttributeCertificateHolder;
-import org.bouncycastle.cert.X509CRLHolder;
-import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.util.Store;
 import org.bouncycastle.util.io.TeeOutputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -54,79 +43,6 @@ class CMSUtils {
             throws CMSException {
         // enforce some limit checking
         return readContentInfo(new ASN1InputStream(input));
-    }
-
-    static List getCertificatesFromStore(Store certStore)
-            throws CMSException {
-        List certs = new ArrayList();
-
-        try {
-            for (Iterator it = certStore.getMatches(null).iterator(); it.hasNext(); ) {
-                X509CertificateHolder c = (X509CertificateHolder) it.next();
-
-                certs.add(c.toASN1Structure());
-            }
-
-            return certs;
-        } catch (ClassCastException e) {
-            throw new CMSException("error processing certs", e);
-        }
-    }
-
-    static List getAttributeCertificatesFromStore(Store attrStore)
-            throws CMSException {
-        List certs = new ArrayList();
-
-        try {
-            for (Iterator it = attrStore.getMatches(null).iterator(); it.hasNext(); ) {
-                X509AttributeCertificateHolder attrCert = (X509AttributeCertificateHolder) it.next();
-
-                certs.add(new DERTaggedObject(false, 2, attrCert.toASN1Structure()));
-            }
-
-            return certs;
-        } catch (ClassCastException e) {
-            throw new CMSException("error processing certs", e);
-        }
-    }
-
-    static List getCRLsFromStore(Store crlStore)
-            throws CMSException {
-        List crls = new ArrayList();
-
-        try {
-            for (Iterator it = crlStore.getMatches(null).iterator(); it.hasNext(); ) {
-                Object rev = it.next();
-
-                if (rev instanceof X509CRLHolder) {
-                    X509CRLHolder c = (X509CRLHolder) rev;
-
-                    crls.add(c.toASN1Structure());
-                } else if (rev instanceof OtherRevocationInfoFormat) {
-                    OtherRevocationInfoFormat infoFormat = OtherRevocationInfoFormat.getInstance(rev);
-
-                    validateInfoFormat(infoFormat);
-
-                    crls.add(new DERTaggedObject(false, 1, infoFormat));
-                } else if (rev instanceof ASN1TaggedObject) {
-                    crls.add(rev);
-                }
-            }
-
-            return crls;
-        } catch (ClassCastException e) {
-            throw new CMSException("error processing certs", e);
-        }
-    }
-
-    private static void validateInfoFormat(OtherRevocationInfoFormat infoFormat) {
-        if (CMSObjectIdentifiers.id_ri_ocsp_response.equals(infoFormat.getInfoFormat())) {
-            OCSPResponse resp = OCSPResponse.getInstance(infoFormat.getInfo());
-
-            if (resp.getResponseStatus().getValue().intValue() != OCSPResponseStatus.SUCCESSFUL) {
-                throw new IllegalArgumentException("cannot add unsuccessful OCSP response to CMS SignedData");
-            }
-        }
     }
 
     static ASN1Set createBerSetFromList(List derObjects) {

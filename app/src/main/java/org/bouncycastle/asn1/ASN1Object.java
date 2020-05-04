@@ -1,24 +1,21 @@
 package org.bouncycastle.asn1;
 
+import org.bouncycastle.util.Encodable;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-
-import org.bouncycastle.util.Encodable;
 
 /**
  * Base class for defining an ASN.1 object.
  */
 public abstract class ASN1Object
-    implements ASN1Encodable, Encodable
-{
-    public void encodeTo(OutputStream output) throws IOException
-    {
+        implements ASN1Encodable, Encodable {
+    public void encodeTo(OutputStream output) throws IOException {
         ASN1OutputStream.create(output).writeObject(this);
     }
 
-    public void encodeTo(OutputStream output, String encoding) throws IOException
-    {
+    public void encodeTo(OutputStream output, String encoding) throws IOException {
         ASN1OutputStream.create(output, encoding).writeObject(this);
     }
 
@@ -28,8 +25,7 @@ public abstract class ASN1Object
      * @return BER/DER byte encoded object.
      * @throws java.io.IOException on encoding error.
      */
-    public byte[] getEncoded() throws IOException
-    {
+    public byte[] getEncoded() throws IOException {
         ByteArrayOutputStream bOut = new ByteArrayOutputStream();
         encodeTo(bOut);
         return bOut.toByteArray();
@@ -42,59 +38,42 @@ public abstract class ASN1Object
      * @return byte encoded object.
      * @throws IOException on encoding error.
      */
-    public byte[] getEncoded(String encoding) throws IOException
-    {
+    public byte[] getEncoded(String encoding) throws IOException {
         ByteArrayOutputStream bOut = new ByteArrayOutputStream();
         encodeTo(bOut, encoding);
         return bOut.toByteArray();
     }
 
-    public int hashCode()
-    {
+    public int hashCode() {
         return this.toASN1Primitive().hashCode();
     }
 
     public boolean equals(
-        Object  o)
-    {
-        if (this == o)
-        {
+            Object o) {
+        if (this == o) {
             return true;
         }
 
-        if (!(o instanceof ASN1Encodable))
-        {
+        if (!(o instanceof ASN1Encodable)) {
             return false;
         }
 
-        ASN1Encodable other = (ASN1Encodable)o;
+        ASN1Encodable other = (ASN1Encodable) o;
 
         return this.toASN1Primitive().equals(other.toASN1Primitive());
     }
 
     /**
-     * @deprecated use toASN1Primitive()
      * @return the underlying primitive type.
+     * @deprecated use toASN1Primitive()
      */
-    public ASN1Primitive toASN1Object()
-    {
+    public ASN1Primitive toASN1Object() {
         return this.toASN1Primitive();
     }
 
     /**
-     * Return true if obj is a byte array and represents an object with the given tag value.
-     *
-     * @param obj object of interest.
-     * @param tagValue tag value to check for.
-     * @return  true if obj is a byte encoding starting with the given tag value, false otherwise.
-     */
-    protected static boolean hasEncodedTagValue(Object obj, int tagValue)
-    {
-        return (obj instanceof byte[]) && ((byte[])obj)[0] == tagValue;
-    }
-
-    /**
      * Method providing a primitive representation of this object suitable for encoding.
+     *
      * @return a primitive representation of this object.
      */
     public abstract ASN1Primitive toASN1Primitive();

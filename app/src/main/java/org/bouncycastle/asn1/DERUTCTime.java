@@ -1,25 +1,13 @@
 package org.bouncycastle.asn1;
 
-import java.util.Date;
-
 /**
  * DER UTC time object.
  */
 public class DERUTCTime
-    extends ASN1UTCTime
-{
-    DERUTCTime(byte[] bytes)
-    {
-        super(bytes);
-    }
+        extends ASN1UTCTime {
 
-    public DERUTCTime(Date time)
-    {
-        super(time);
-    }
 
-    public DERUTCTime(String time)
-    {
+    public DERUTCTime(String time) {
         super(time);
     }
 

@@ -3,14 +3,9 @@ package org.bouncycastle.jcajce.provider.asymmetric.x509;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Null;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.edec.EdECObjectIdentifiers;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
-import org.bouncycastle.jcajce.util.MessageDigestUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.io.IOException;
@@ -60,21 +55,6 @@ class X509SignatureUtil {
 
     static String getSignatureName(
             AlgorithmIdentifier sigAlgId) {
-        ASN1Encodable params = sigAlgId.getParameters();
-
-        if (params != null && !derNull.equals(params)) {
-            if (sigAlgId.getAlgorithm().equals(PKCSObjectIdentifiers.id_RSASSA_PSS)) {
-                RSASSAPSSparams rsaParams = RSASSAPSSparams.getInstance(params);
-
-                return getDigestAlgName(rsaParams.getHashAlgorithm().getAlgorithm()) + "withRSAandMGF1";
-            }
-            if (sigAlgId.getAlgorithm().equals(X9ObjectIdentifiers.ecdsa_with_SHA2)) {
-                ASN1Sequence ecDsaParams = ASN1Sequence.getInstance(params);
-
-                return getDigestAlgName((ASN1ObjectIdentifier) ecDsaParams.getObjectAt(0)) + "withECDSA";
-            }
-        }
-
         // deal with the "weird" ones.
         String algName = algNames.get(sigAlgId.getAlgorithm());
         if (algName != null) {
@@ -82,22 +62,6 @@ class X509SignatureUtil {
         }
 
         return findAlgName(sigAlgId.getAlgorithm());
-    }
-
-    /**
-     * Return the digest algorithm using one of the standard JCA string
-     * representations rather the the algorithm identifier (if possible).
-     */
-    private static String getDigestAlgName(
-            ASN1ObjectIdentifier digestAlgOID) {
-        String name = MessageDigestUtils.getDigestName(digestAlgOID);
-
-        int dIndex = name.indexOf('-');
-        if (dIndex > 0 && !name.startsWith("SHA3")) {
-            return name.substring(0, dIndex) + name.substring(dIndex + 1);
-        }
-
-        return MessageDigestUtils.getDigestName(digestAlgOID);
     }
 
     private static String findAlgName(ASN1ObjectIdentifier algOid) {

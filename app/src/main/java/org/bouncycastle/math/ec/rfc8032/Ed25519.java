@@ -8,8 +8,6 @@ import org.bouncycastle.math.raw.Nat256;
 import org.bouncycastle.util.Arrays;
 import org.bouncycastle.util.Strings;
 
-import java.math.BigInteger;
-
 public abstract class Ed25519 {
     // -x^2 + y^2 == 1 + 0x52036CEE2B6FFE738CC740797779E89800700A4D4141D8AB75EB4DCA135978A3 * x^2 * y^2
     public static final class Algorithm {
@@ -209,6 +207,7 @@ public abstract class Ed25519 {
         encode32((int) n, bs, off);
         encode24((int) (n >>> 32), bs, off + 4);
     }
+
     private static int encodePoint(PointAccum p, byte[] r, int rOff) {//encoding jadi titik R
         int[] x = X25519Field.create();
         int[] y = X25519Field.create();

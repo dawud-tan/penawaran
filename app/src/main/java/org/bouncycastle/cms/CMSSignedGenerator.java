@@ -1,7 +1,5 @@
 package org.bouncycastle.cms;
 
-import org.bouncycastle.util.Store;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -20,45 +18,6 @@ public class CMSSignedGenerator {
      * base constructor
      */
     protected CMSSignedGenerator() {
-    }
-
-
-    /**
-     * Add the certificates in certStore to the certificate set to be included with the generated SignedData message.
-     *
-     * @param certStore the store containing the certificates to be included.
-     * @throws CMSException if the certificates cannot be encoded for adding.
-     */
-    public void addCertificates(
-            Store certStore)
-            throws CMSException {
-        certs.addAll(CMSUtils.getCertificatesFromStore(certStore));
-    }
-
-
-    /**
-     * Add the CRLs in crlStore to the CRL set to be included with the generated SignedData message.
-     *
-     * @param crlStore the store containing the CRLs to be included.
-     * @throws CMSException if the CRLs cannot be encoded for adding.
-     */
-    public void addCRLs(
-            Store crlStore)
-            throws CMSException {
-        crls.addAll(CMSUtils.getCRLsFromStore(crlStore));
-    }
-
-
-    /**
-     * Add the attribute certificates in attrStore to the certificate set to be included with the generated SignedData message.
-     *
-     * @param attrStore the store containing the certificates to be included.
-     * @throws CMSException if the attribute certificate cannot be encoded for adding.
-     */
-    public void addAttributeCertificates(
-            Store attrStore)
-            throws CMSException {
-        certs.addAll(CMSUtils.getAttributeCertificatesFromStore(attrStore));
     }
 
     /**

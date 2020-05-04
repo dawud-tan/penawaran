@@ -15,9 +15,9 @@ import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.util.BigIntegers;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.Enumeration;
 
 /**
@@ -98,7 +98,7 @@ public class PrivateKeyInfo
             ASN1Set attributes,
             byte[] publicKey)
             throws IOException {
-        this.version = new ASN1Integer(publicKey != null ? BigIntegers.ONE : BigIntegers.ZERO);
+        this.version = new ASN1Integer(publicKey != null ? BigInteger.ONE : BigInteger.ZERO);
         this.privateKeyAlgorithm = privateKeyAlgorithm;
         this.privateKey = new DEROctetString(privateKey);
         this.attributes = attributes;

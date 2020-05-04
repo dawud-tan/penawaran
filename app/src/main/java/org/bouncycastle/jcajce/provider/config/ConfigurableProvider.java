@@ -1,7 +1,5 @@
 package org.bouncycastle.jcajce.provider.config;
 
-import java.util.Map;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.jcajce.provider.util.AsymmetricKeyInfoConverter;
 
@@ -9,8 +7,7 @@ import org.bouncycastle.jcajce.provider.util.AsymmetricKeyInfoConverter;
  * Implemented by the BC provider. This allows setting of hidden parameters,
  * such as the ImplicitCA parameters from X.962, if used.
  */
-public interface ConfigurableProvider
-{
+public interface ConfigurableProvider {
 
     void addAlgorithm(String key, String value);
 

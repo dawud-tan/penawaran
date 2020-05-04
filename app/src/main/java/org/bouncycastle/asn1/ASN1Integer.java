@@ -118,16 +118,6 @@ public class ASN1Integer
         this.start = signBytesToSkip(bytes);
     }
 
-    /**
-     * in some cases positive values get crammed into a space,
-     * that's not quite big enough...
-     *
-     * @return the BigInteger that results from treating this ASN.1 INTEGER as unsigned.
-     */
-    public BigInteger getPositiveValue() {
-        return new BigInteger(1, bytes);
-    }
-
     public BigInteger getValue() {
         return new BigInteger(bytes);
     }
@@ -185,17 +175,6 @@ public class ASN1Integer
         int pos = Math.max(start, length - 4);
 
         int val = bytes[pos] & signExt;
-        while (++pos < length) {
-            val = (val << 8) | (bytes[pos] & SIGN_EXT_UNSIGNED);
-        }
-        return val;
-    }
-
-    static long longValue(byte[] bytes, int start, int signExt) {
-        int length = bytes.length;
-        int pos = Math.max(start, length - 8);
-
-        long val = bytes[pos] & signExt;
         while (++pos < length) {
             val = (val << 8) | (bytes[pos] & SIGN_EXT_UNSIGNED);
         }

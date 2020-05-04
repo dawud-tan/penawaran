@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.Vector;
 
 /**
  * String utilities.
@@ -17,11 +16,9 @@ public final class Strings {
 
     static {
         try {
-            LINE_SEPARATOR = AccessController.doPrivileged(new PrivilegedAction<String>() {
-                public String run() {
-                    // the easy way
-                    return System.getProperty("line.separator");
-                }
+            LINE_SEPARATOR = AccessController.doPrivileged((PrivilegedAction<String>) () -> {
+                // the easy way
+                return System.getProperty("line.separator");
             });
 
         } catch (Exception e) {
@@ -190,31 +187,6 @@ public final class Strings {
         }
 
         return chars;
-    }
-
-    public static String[] split(String input, char delimiter) {
-        Vector v = new Vector();
-        boolean moreTokens = true;
-        String subString;
-
-        while (moreTokens) {
-            int tokenLocation = input.indexOf(delimiter);
-            if (tokenLocation > 0) {
-                subString = input.substring(0, tokenLocation);
-                v.addElement(subString);
-                input = input.substring(tokenLocation + 1);
-            } else {
-                moreTokens = false;
-                v.addElement(input);
-            }
-        }
-
-        String[] res = new String[v.size()];
-
-        for (int i = 0; i != res.length; i++) {
-            res[i] = (String) v.elementAt(i);
-        }
-        return res;
     }
 
     public static String lineSeparator() {

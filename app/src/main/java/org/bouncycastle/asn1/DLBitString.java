@@ -67,11 +67,6 @@ public class DLBitString
         }
     }
 
-    protected DLBitString(byte data, int padBits)
-    {
-        super(data, padBits);
-    }
-
     /**
      * @param data the octets making up the bit string.
      * @param padBits the number of extra bits at the end of the string.
@@ -83,24 +78,6 @@ public class DLBitString
         super(data, padBits);
     }
 
-    public DLBitString(
-        byte[]  data)
-    {
-        this(data, 0);
-    }
-
-    public DLBitString(
-        int value)
-    {
-        super(getBytes(value), getPadBits(value));
-    }
-
-    public DLBitString(
-        ASN1Encodable obj)
-        throws IOException
-    {
-        super(obj.toASN1Primitive().getEncoded(ASN1Encoding.DER), 0);
-    }
 
     boolean isConstructed()
     {

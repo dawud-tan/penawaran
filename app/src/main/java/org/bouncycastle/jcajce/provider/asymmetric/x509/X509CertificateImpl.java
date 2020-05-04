@@ -2,21 +2,14 @@ package org.bouncycastle.jcajce.provider.asymmetric.x509;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Encoding;
-import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.DERBitString;
-import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.misc.MiscObjectIdentifiers;
-import org.bouncycastle.asn1.misc.NetscapeCertType;
-import org.bouncycastle.asn1.misc.NetscapeRevocationURL;
-import org.bouncycastle.asn1.misc.VerisignCzagExtension;
-import org.bouncycastle.asn1.util.ASN1Dump;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.RFC4519Style;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -24,7 +17,6 @@ import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.jcajce.interfaces.BCX509Certificate;
 import org.bouncycastle.jcajce.io.OutputStreamFactory;
 import org.bouncycastle.jcajce.util.JcaJceHelper;
@@ -32,8 +24,6 @@ import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.Arrays;
 import org.bouncycastle.util.Integers;
-import org.bouncycastle.util.Strings;
-import org.bouncycastle.util.encoders.Hex;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -383,74 +373,7 @@ abstract class X509CertificateImpl
     }
 
     public String toString() {
-        StringBuffer buf = new StringBuffer();
-        String nl = Strings.lineSeparator();
-
-        buf.append("  [0]         Version: ").append(this.getVersion()).append(nl);
-        buf.append("         SerialNumber: ").append(this.getSerialNumber()).append(nl);
-        buf.append("             IssuerDN: ").append(this.getIssuerDN()).append(nl);
-        buf.append("           Start Date: ").append(this.getNotBefore()).append(nl);
-        buf.append("           Final Date: ").append(this.getNotAfter()).append(nl);
-        buf.append("            SubjectDN: ").append(this.getSubjectDN()).append(nl);
-        buf.append("           Public Key: ").append(this.getPublicKey()).append(nl);
-        buf.append("  Signature Algorithm: ").append(this.getSigAlgName()).append(nl);
-
-        byte[] sig = this.getSignature();
-
-        buf.append("            Signature: ").append(new String(Hex.encode(sig, 0, 20))).append(nl);
-        for (int i = 20; i < sig.length; i += 20) {
-            if (i < sig.length - 20) {
-                buf.append("                       ").append(new String(Hex.encode(sig, i, 20))).append(nl);
-            } else {
-                buf.append("                       ").append(new String(Hex.encode(sig, i, sig.length - i))).append(nl);
-            }
-        }
-
-        Extensions extensions = c.getTBSCertificate().getExtensions();
-
-        if (extensions != null) {
-            Enumeration e = extensions.oids();
-
-            if (e.hasMoreElements()) {
-                buf.append("       Extensions: \n");
-            }
-
-            while (e.hasMoreElements()) {
-                ASN1ObjectIdentifier oid = (ASN1ObjectIdentifier) e.nextElement();
-                Extension ext = extensions.getExtension(oid);
-
-                if (ext.getExtnValue() != null) {
-                    byte[] octs = ext.getExtnValue().getOctets();
-                    ASN1InputStream dIn = new ASN1InputStream(octs);
-                    buf.append("                       critical(").append(ext.isCritical()).append(") ");
-                    try {
-                        if (oid.equals(Extension.basicConstraints)) {
-                            buf.append(BasicConstraints.getInstance(dIn.readObject())).append(nl);
-                        } else if (oid.equals(Extension.keyUsage)) {
-                            buf.append(KeyUsage.getInstance(dIn.readObject())).append(nl);
-                        } else if (oid.equals(MiscObjectIdentifiers.netscapeCertType)) {
-                            buf.append(new NetscapeCertType(DERBitString.getInstance(dIn.readObject()))).append(nl);
-                        } else if (oid.equals(MiscObjectIdentifiers.netscapeRevocationURL)) {
-                            buf.append(new NetscapeRevocationURL(DERIA5String.getInstance(dIn.readObject()))).append(nl);
-                        } else if (oid.equals(MiscObjectIdentifiers.verisignCzagExtension)) {
-                            buf.append(new VerisignCzagExtension(DERIA5String.getInstance(dIn.readObject()))).append(nl);
-                        } else {
-                            buf.append(oid.getId());
-                            buf.append(" value = ").append(ASN1Dump.dumpAsString(dIn.readObject())).append(nl);
-                            //buf.append(" value = ").append("*****").append(nl);
-                        }
-                    } catch (Exception ex) {
-                        buf.append(oid.getId());
-                        //     buf.append(" value = ").append(new String(Hex.encode(ext.getExtnValue().getOctets()))).append(nl);
-                        buf.append(" value = ").append("*****").append(nl);
-                    }
-                } else {
-                    buf.append(nl);
-                }
-            }
-        }
-
-        return buf.toString();
+        return X509CertificateImpl.class.getCanonicalName();
     }
 
     public final void verify(

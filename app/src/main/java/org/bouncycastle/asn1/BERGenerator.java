@@ -22,10 +22,10 @@ public class BERGenerator
     protected BERGenerator(
         OutputStream out,
         int tagNo,
-        boolean isExplicit) 
+        boolean isExplicit)
     {
         super(out);
-        
+
         _tagged = true;
         _isExplicit = isExplicit;
         _tagNo = tagNo;
@@ -35,7 +35,7 @@ public class BERGenerator
     {
         return _out;
     }
-    
+
     private void writeHdr(
         int tag)
         throws IOException
@@ -43,9 +43,9 @@ public class BERGenerator
         _out.write(tag);
         _out.write(0x80);
     }
-    
+
     protected void writeBERHeader(
-        int tag) 
+        int tag)
         throws IOException
     {
         if (_tagged)
@@ -58,7 +58,7 @@ public class BERGenerator
                 writeHdr(tag);
             }
             else
-            {   
+            {
                 if ((tag & BERTags.CONSTRUCTED) != 0)
                 {
                     writeHdr(tagNum | BERTags.CONSTRUCTED);
@@ -80,7 +80,7 @@ public class BERGenerator
     {
         _out.write(0x00);
         _out.write(0x00);
-        
+
         if (_tagged && _isExplicit)  // write extra end for tag header
         {
             _out.write(0x00);
