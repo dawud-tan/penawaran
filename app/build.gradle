@@ -31,15 +31,15 @@ android {
     }
     applicationVariants.all { variant ->
         variant.outputs.all {
-            outputFileName = "ed25519.apk"
+            outputFileName = "penawaran.apk"
         }
     }
 }
 
 dependencies {
-    api group: 'androidx.appcompat', name: 'appcompat', version: '1.1.0'
-    api group: 'androidx.annotation', name: 'annotation', version: '1.1.0'
-    api group: 'androidx.coordinatorlayout', name: 'coordinatorlayout', version: '1.1.0'
-    api group: 'com.google.android.material', name: 'material', version: '1.1.0'
-    api group: 'com.sun.mail', name: 'android-mail', version: '1.6.5'
+    implementation group: 'androidx.appcompat', name: 'appcompat', version: '1.1.0'
+    implementation group: 'androidx.annotation', name: 'annotation', version: '1.1.0'
+    implementation group: 'androidx.coordinatorlayout', name: 'coordinatorlayout', version: '1.1.0'
+    implementation group: 'com.google.android.material', name: 'material', version: '1.1.0'
+    implementation group: 'com.sun.mail', name: 'android-mail', version: '1.6.5'
 }
