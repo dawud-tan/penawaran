@@ -367,15 +367,14 @@ public class MainActivity extends AppCompatActivity {
 
     private String getBinaryString(String asal) {
         StringBuilder sb = new StringBuilder();
-        char[] buffer = asal.toCharArray();
-        byte[] b = new byte[buffer.length << 1];
-        for (int i = 0; i < buffer.length; i++) {
-            int bpos = i << 1;
-            b[bpos] = (byte) ((buffer[i] & 0xFF00) >> 8);
-            sb.append(Integer.toBinaryString((b[bpos] & 0xFF) + 0x100).substring(1));
-            b[bpos + 1] = (byte) (buffer[i] & 0x00FF);
-            sb.append(Integer.toBinaryString((b[bpos + 1] & 0xFF) + 0x100).substring(1));
-            sb.append(" ");
+        for (int j = 0; j < asal.length(); j++) {
+            String a = asal.substring(j, j + 1);
+            sb.append(a);
+            sb.append(": ");
+            for (byte b : a.getBytes()) {
+                sb.append(Integer.toBinaryString((b & 0xFF) + 0x100).substring(1));
+            }
+            sb.append("\r\n");
         }
         return sb.toString();
     }
