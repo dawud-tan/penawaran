@@ -1,2 +1,2 @@
 # penawaran
-aplikasi membungkus penawaran dengan multipart/signed
+aplikasi untuk mengirim penawaran ke https://github.com/dawud-tan/penerimaan
