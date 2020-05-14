@@ -264,6 +264,7 @@ public class MainActivity extends AppCompatActivity {
                 offereeCert.checkValidity();
                 boolean hasil = signerInformation.verify(siv);
                 verifikasiTtdOfferee.setText(hasil ? "Pesan dari offeree utuh, tdk termodifikasi" : "termodifikasi");
+                TampilkanPerubahanFragment.newInstance().show(getSupportFragmentManager(), "1");
             } catch (Exception ex) {
                 Snackbar.make(mCoordinatorLayout, ex.getMessage(), Snackbar.LENGTH_LONG).show();
                 ex.printStackTrace();
