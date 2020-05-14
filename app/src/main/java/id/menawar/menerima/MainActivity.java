@@ -89,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
         mCoordinatorLayout = findViewById(R.id.koordinatorLayout);
         alamatOfferee = findViewById(R.id.alamatOfferee);
         kontrakElektronikPasal18UUITE2008 = findViewById(R.id.kontrakElektronikPasal18UUITE2008);
+        kontrakElektronikPasal18UUITE2008.requestFocus();
         /**
          * § 2-201. Formal Requirements; Statute of Frauds.
          * (1) A contract for the sale of goods for the price of $5,000 or more is not enforceable
