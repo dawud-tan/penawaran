@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion '29.0.3'
+    compileSdkVersion 'android-R'
+    buildToolsVersion '30.0.0-rc4'
 
     defaultConfig {
         applicationId 'id.menawar.menerima'
         minSdkVersion 17
-        targetSdkVersion 29
+        targetSdkVersion 'R'
         versionCode 1
         versionName '1.0.0'
     }
@@ -40,6 +40,6 @@ dependencies {
     implementation group: 'androidx.appcompat', name: 'appcompat', version: '1.2.0-rc01'
     implementation group: 'androidx.annotation', name: 'annotation', version: '1.1.0'
     implementation group: 'androidx.coordinatorlayout', name: 'coordinatorlayout', version: '1.1.0'
-    implementation group: 'com.google.android.material', name: 'material', version: '1.1.0'
+    implementation group: 'com.google.android.material', name: 'material', version: '1.2.0-beta01'
     implementation group: 'com.sun.mail', name: 'android-mail', version: '1.6.5'
 }
