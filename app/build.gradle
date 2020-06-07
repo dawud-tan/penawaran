@@ -1,22 +1,20 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 'android-R'
-    buildToolsVersion '30.0.0-rc4'
+    compileSdkVersion 29
+    buildToolsVersion '29.0.3'
 
     defaultConfig {
         applicationId 'id.menawar.menerima'
         minSdkVersion 17
-        targetSdkVersion 'R'
+        targetSdkVersion 29
         versionCode 1
         versionName '1.0.0'
     }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-
     buildTypes {
         debug {
             minifyEnabled true
