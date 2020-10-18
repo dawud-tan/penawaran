@@ -1,13 +1,14 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:textViewStyle">@style/TimesDigitalTextViewStyle</item>
-        <item name="android:buttonStyle">@style/TimesDigitalButtonStyle</item>
+        <item name="android:textViewStyle">@style/GyreScholaTextViewStyle</item>
+        <item name="android:buttonStyle">@style/GyreScholaButtonStyle</item>
+        <item name="textInputStyle">@style/CustomFontTextInputLayout</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -15,11 +16,44 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="TimesDigitalTextViewStyle" parent="android:Widget.TextView">
-        <item name="android:fontFamily">@font/timesdigitalw04_regular</item>
+    <style name="GyreScholaTextViewStyle" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/texgyreschola_regular</item>
     </style>
 
-    <style name="TimesDigitalButtonStyle" parent="android:Widget.Holo.Button">
-        <item name="android:fontFamily">@font/timesdigitalw04_regular</item>
+    <style name="GyreScholaButtonStyle" parent="android:Widget.Holo.Button">
+        <item name="android:fontFamily">@font/texgyreschola_regular</item>
     </style>
+
+    <!-- region TextInputLayout & TextInputEditText styles -->
+    <style name="TextInputLayout.OutlineBox.CustomFont" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="android:theme">@style/ThemeOverlay.TextInputEditText.OutlinedBox.CustomFont
+        </item>
+    </style>
+
+    <style name="ThemeOverlay.TextInputEditText.OutlinedBox.CustomFont" parent="ThemeOverlay.MaterialComponents.TextInputEditText.OutlinedBox">
+        <item name="editTextStyle">@style/TextInputEditText.OutlinedBox.CustomFont</item>
+    </style>
+
+    <style name="TextInputEditText.OutlinedBox.CustomFont" parent="Widget.MaterialComponents.TextInputEditText.OutlinedBox">
+        <item name="android:fontFamily">@font/texgyreschola_regular</item>
+    </style>
+
+    <style name="CustomFontTextInputLayout" parent="Widget.Design.TextInputLayout">
+        <item name="hintTextAppearance">@style/TextInputLayoutHintText</item>
+        <item name="helperTextTextAppearance">@style/TextInputLayoutHelperText</item>
+        <item name="errorTextAppearance">@style/TextInputLayoutErrorText</item>
+    </style>
+
+    <style name="TextInputLayoutHintText" parent="TextAppearance.Design.Hint">
+        <item name="android:fontFamily">@font/texgyreschola_regular</item>
+    </style>
+
+    <style name="TextInputLayoutHelperText" parent="TextAppearance.Design.HelperText">
+        <item name="android:fontFamily">@font/texgyreschola_regular</item>
+    </style>
+
+    <style name="TextInputLayoutErrorText" parent="TextAppearance.Design.Error">
+        <item name="android:fontFamily">@font/texgyreschola_regular</item>
+    </style>
+    <!-- endregion -->
 </resources>
