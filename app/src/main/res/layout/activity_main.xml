@@ -49,7 +49,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ems="10"
-                    android:fontFamily="@font/droid_arabic_naskh"
+                    android:fontFamily="@font/lpmqisepmisbah_regular"
                     android:hint="Kontrak Elektronik Pasal 18 UU ITE 2008"
                     android:inputType="textMultiLine"
                     android:layoutDirection="rtl"
