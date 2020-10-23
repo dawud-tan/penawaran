@@ -11,10 +11,8 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingStart="@dimen/activity_horizontal_margin"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
-        android:paddingEnd="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingBottom="@dimen/activity_vertical_margin"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
@@ -56,7 +54,7 @@
                 style="@style/TextInputLayout.OutlineBox.CustomFont"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Penyandian Biner Kontrak">
+                android:hint="Penyandian Dwimal Kontrak">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/dwimalisasiRedaksiKontrak"
@@ -169,5 +167,5 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_dialog_email" />
+        app:srcCompat="@mipmap/ic_launcher_round" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
