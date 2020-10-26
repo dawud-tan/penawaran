@@ -169,8 +169,8 @@ public class MainActivity extends AppCompatActivity {
 
         ttdOfferor = findViewById(R.id.ttdOfferor);
         try {
-            byte[] larikRedaksiKontrak = perikatanElektronikPasal18UUITE2008.getText().toString().getBytes("UTF-8");
-            signature.update(larikRedaksiKontrak);
+            byte[] larikRedaksiPerikatan = perikatanElektronikPasal18UUITE2008.getText().toString().getBytes("UTF-8");
+            signature.update(larikRedaksiPerikatan);
 
             byte[] sig = signature.sign();
 

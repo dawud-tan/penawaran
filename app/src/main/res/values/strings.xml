@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">Akta Bawah Tangan</string>
     <string name="penawaran" translatable="false">http://akta-bawah-tangan.ip-dynamic.com</string>
-    <string name="alamatOfferee" translatable="false">http://akta-bawah-tangan.ip-dynamic.com/pembentukan-kontrak-elektronik</string>
+    <string name="alamatOfferee" translatable="false">http://akta-bawah-tangan.ip-dynamic.com/pembentukan-perikatan-elektronik</string>
 </resources>
