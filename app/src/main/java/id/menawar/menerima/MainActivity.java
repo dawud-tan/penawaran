@@ -61,7 +61,7 @@ import id.menawar.menerima.utility.PemUtils;
  */
 public class MainActivity extends AppCompatActivity {
     private CoordinatorLayout mCoordinatorLayout;
-    private TextInputEditText alamatOfferee, kontrakElektronikPasal18UUITE2008, dwimalisasiRedaksiKontrak, kunciPenandatangananOfferor, ttdOfferor, responOfferee, kunciVerifikasiOfferee, ttdOfferee, verifikasiTtdOfferee;
+    private TextInputEditText alamatOfferee, perikatanElektronikPasal18UUITE2008, dwimalisasiRedaksiPerikatan, kunciPenandatangananOfferor, ttdOfferor, responOfferee, kunciVerifikasiOfferee, ttdOfferee, verifikasiTtdOfferee;
     private ExecutorService es = Executors.newSingleThreadExecutor();
     private X509Certificate offereeCert;
     private X509Certificate offerorCert;
@@ -88,8 +88,8 @@ public class MainActivity extends AppCompatActivity {
         inisialisasi();
         mCoordinatorLayout = findViewById(R.id.koordinatorLayout);
         alamatOfferee = findViewById(R.id.alamatOfferee);
-        kontrakElektronikPasal18UUITE2008 = findViewById(R.id.kontrakElektronikPasal18UUITE2008);
-        kontrakElektronikPasal18UUITE2008.requestFocus();
+        perikatanElektronikPasal18UUITE2008 = findViewById(R.id.perikatanElektronikPasal18UUITE2008);
+        perikatanElektronikPasal18UUITE2008.requestFocus();
         /**
          * § 2-201. Formal Requirements; Statute of Frauds.
          * (1) A contract for the sale of goods for the price of $5,000 or more is not enforceable
@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
          *
          * H. Gabriel, L. Rusch and A. Boss, The ABCs of the UCC (Revised) Article 2: Sales. Chicago, IL: ABA, Section of Business Law, 2004.
          */
-        kontrakElektronikPasal18UUITE2008.addTextChangedListener(new TextWatcher() {
+        perikatanElektronikPasal18UUITE2008.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     String redaksi = editable.toString();//"Electronically Stored Information, electronic discovery, Federal Rules of Civil Procedure
                     byte[] teks = redaksi.getBytes("UTF-8");//"Electronically Stored Information, electronic discovery, Federal Rules of Civil Procedure
-                    dwimalisasiRedaksiKontrak.setText(getBinaryString(redaksi));
+                    dwimalisasiRedaksiPerikatan.setText(getBinaryString(redaksi));
                     signature.update(teks);
                     byte[] sig = signature.sign();
 
@@ -142,8 +142,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        dwimalisasiRedaksiKontrak = findViewById(R.id.dwimalisasiRedaksiKontrak);
-        dwimalisasiRedaksiKontrak.setText(getBinaryString(kontrakElektronikPasal18UUITE2008.getText().toString()));
+        dwimalisasiRedaksiPerikatan = findViewById(R.id.dwimalisasiRedaksiPerikatan);
+        dwimalisasiRedaksiPerikatan.setText(getBinaryString(perikatanElektronikPasal18UUITE2008.getText().toString()));
 
         kunciPenandatangananOfferor = findViewById(R.id.kunciPenandatangananOfferor);
         try {
@@ -169,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
 
         ttdOfferor = findViewById(R.id.ttdOfferor);
         try {
-            byte[] larikRedaksiKontrak = kontrakElektronikPasal18UUITE2008.getText().toString().getBytes("UTF-8");
+            byte[] larikRedaksiKontrak = perikatanElektronikPasal18UUITE2008.getText().toString().getBytes("UTF-8");
             signature.update(larikRedaksiKontrak);
 
             byte[] sig = signature.sign();
@@ -222,9 +222,9 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.fab).setOnClickListener(view -> {
             try {
                 formValidation();
-                String redaksiKontrak = kontrakElektronikPasal18UUITE2008.getText().toString();
-                dwimalisasiRedaksiKontrak.setText(getBinaryString(redaksiKontrak));
-                signature.update(redaksiKontrak.getBytes("utf-8"));
+                String redaksiPerikatan = perikatanElektronikPasal18UUITE2008.getText().toString();
+                dwimalisasiRedaksiPerikatan.setText(getBinaryString(redaksiPerikatan));
+                signature.update(redaksiPerikatan.getBytes("utf-8"));
                 byte[] sig = signature.sign();
                 byte[] Rr = org.bouncycastle.util.Arrays.copyOfRange(sig, 0, 32);//Decode the first half as a point R
                 Ed25519.PointAffine pAr = new Ed25519.PointAffine();
@@ -239,7 +239,7 @@ public class MainActivity extends AppCompatActivity {
 
                 ttdOfferor.setText("R.X: " + toBigInt(rXr).toString() + "\nR.Y: " + toBigInt(rYr).toString() + "\nS: " + toBigInt(Sr).toString());
 
-                Future<MimeMultipart> pesan = CallSynchronous("redaksiKontrak=" + URLEncoder.encode(redaksiKontrak, "utf-8"), alamatOfferee.getText().toString());
+                Future<MimeMultipart> pesan = CallSynchronous("redaksiPerikatan=" + URLEncoder.encode(redaksiPerikatan, "utf-8"), alamatOfferee.getText().toString());
                 MimeMultipart body = pesan.get();
 
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();

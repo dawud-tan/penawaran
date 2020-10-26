@@ -6,8 +6,8 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:textViewStyle">@style/GyreScholaTextViewStyle</item>
-        <item name="android:buttonStyle">@style/GyreScholaButtonStyle</item>
+        <item name="android:textViewStyle">@style/LucidaBrightOTTextViewStyle</item>
+        <item name="android:buttonStyle">@style/LucidaBrightOTButtonStyle</item>
         <item name="textInputStyle">@style/CustomFontTextInputLayout</item>
     </style>
 
@@ -16,12 +16,12 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="GyreScholaTextViewStyle" parent="android:Widget.TextView">
-        <item name="android:fontFamily">@font/texgyreschola_regular</item>
+    <style name="LucidaBrightOTTextViewStyle" parent="android:Widget.TextView">
+        <item name="android:fontFamily">@font/lucidabrightot_regular</item>
     </style>
 
-    <style name="GyreScholaButtonStyle" parent="android:Widget.Holo.Button">
-        <item name="android:fontFamily">@font/texgyreschola_regular</item>
+    <style name="LucidaBrightOTButtonStyle" parent="android:Widget.Holo.Button">
+        <item name="android:fontFamily">@font/lucidabrightot_regular</item>
     </style>
 
     <!-- region TextInputLayout & TextInputEditText styles -->
@@ -35,7 +35,7 @@
     </style>
 
     <style name="TextInputEditText.OutlinedBox.CustomFont" parent="Widget.MaterialComponents.TextInputEditText.OutlinedBox">
-        <item name="android:fontFamily">@font/texgyreschola_regular</item>
+        <item name="android:fontFamily">@font/lucidabrightot_regular</item>
     </style>
 
     <style name="CustomFontTextInputLayout" parent="Widget.Design.TextInputLayout">
@@ -45,15 +45,15 @@
     </style>
 
     <style name="TextInputLayoutHintText" parent="TextAppearance.Design.Hint">
-        <item name="android:fontFamily">@font/texgyreschola_regular</item>
+        <item name="android:fontFamily">@font/lucidabrightot_regular</item>
     </style>
 
     <style name="TextInputLayoutHelperText" parent="TextAppearance.Design.HelperText">
-        <item name="android:fontFamily">@font/texgyreschola_regular</item>
+        <item name="android:fontFamily">@font/lucidabrightot_regular</item>
     </style>
 
     <style name="TextInputLayoutErrorText" parent="TextAppearance.Design.Error">
-        <item name="android:fontFamily">@font/texgyreschola_regular</item>
+        <item name="android:fontFamily">@font/lucidabrightot_regular</item>
     </style>
     <!-- endregion -->
 </resources>

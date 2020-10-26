@@ -42,11 +42,11 @@
                 android:layout_weight="1">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/kontrakElektronikPasal18UUITE2008"
+                    android:id="@+id/perikatanElektronikPasal18UUITE2008"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ems="10"
-                    android:hint="Kontrak Elektronik Pasal 18 UU ITE 2008"
+                    android:hint="Perikatan Daring Pasal 18 UU ITE 2008"
                     android:inputType="textMultiLine" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -54,10 +54,10 @@
                 style="@style/TextInputLayout.OutlineBox.CustomFont"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Penyandian Dwimal Kontrak">
+                android:hint="Penyandian Dwimal Perikatan">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/dwimalisasiRedaksiKontrak"
+                    android:id="@+id/dwimalisasiRedaksiPerikatan"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textMultiLine"
