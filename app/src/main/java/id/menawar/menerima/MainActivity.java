@@ -1,5 +1,7 @@
 package id.menawar.menerima;
 
+import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -44,8 +46,10 @@ import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
+import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -70,19 +74,35 @@ public class MainActivity extends AppCompatActivity {
     private SMIMESignedGenerator gen;
     private Signature signature;
     private MessageDigest digest;
+    Format numberFormat;
 
+    private Locale getCurrentLocale(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return context.getResources().getConfiguration().getLocales().get(0);
+        } else {
+            return context.getResources().getConfiguration().locale;
+        }
+    }
 
-    private static BigInteger toBigInt(byte[] arr) {
+    private String toBigInt(byte[] arr) {
         byte[] rev = new byte[arr.length + 1];
         for (int i = 0, j = arr.length; j > 0; i++, j--)
             rev[j] = arr[i];
-        return new BigInteger(1, rev);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+            return ((android.icu.text.DecimalFormat) numberFormat).format(new BigInteger(1, rev));
+        else
+            return ((java.text.DecimalFormat) numberFormat).format(new BigInteger(1, rev));
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Locale locale = getCurrentLocale(this);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+            numberFormat = android.icu.text.NumberFormat.getInstance(locale);
+        else
+            numberFormat = java.text.NumberFormat.getInstance(locale);
 
         //AWAL inisialisasi
         inisialisasi();
@@ -135,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
 
                     byte[] S = org.bouncycastle.util.Arrays.copyOfRange(sig, 32, 64);//Decode the second half as an integer S, in the range 0 <= s < L
 
-                    ttdOfferor.setText("R.X: " + toBigInt(rX).toString() + "\nR.Y: " + toBigInt(rY).toString() + "\nS: " + toBigInt(S).toString());
+                    ttdOfferor.setText("R.X: " + toBigInt(rX) + "\nR.Y: " + toBigInt(rY) + "\nS: " + toBigInt(S));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -155,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
             s[0] &= 0xF8;
             s[31] &= 0x7F;
             s[31] |= 0x40;
-            kunciPenandatangananOfferor.setText(toBigInt(s).toString());//kunci pribadi bisa berumur panjang,
+            kunciPenandatangananOfferor.setText(toBigInt(s));//kunci pribadi bisa berumur panjang,
             // compromised setelah dpakai membuat ttd, ttd lama yang sudah terjadi tetap verified kan.
             // beda dengan kunci publik utk enkripsi
 
@@ -185,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
 
             byte[] S = org.bouncycastle.util.Arrays.copyOfRange(sig, 32, 64);//Decode the second half as an integer S, in the range 0 <= s < L
 
-            ttdOfferor.setText("R.X: " + toBigInt(rX).toString() + "\nR.Y: " + toBigInt(rY).toString() + "\nS: " + toBigInt(S).toString());
+            ttdOfferor.setText("R.X: " + toBigInt(rX) + "\nR.Y: " + toBigInt(rY) + "\nS: " + toBigInt(S));
 
         } catch (SignatureException e) {
             e.printStackTrace();
@@ -237,7 +257,7 @@ public class MainActivity extends AppCompatActivity {
 
                 byte[] Sr = org.bouncycastle.util.Arrays.copyOfRange(sig, 32, 64);//Decode the second half as an integer S, in the range 0 <= s < L
 
-                ttdOfferor.setText("R.X: " + toBigInt(rXr).toString() + "\nR.Y: " + toBigInt(rYr).toString() + "\nS: " + toBigInt(Sr).toString());
+                ttdOfferor.setText("R.X: " + toBigInt(rXr) + "\nR.Y: " + toBigInt(rYr) + "\nS: " + toBigInt(Sr));
 
                 Future<MimeMultipart> pesan = CallSynchronous("redaksiPerikatan=" + URLEncoder.encode(redaksiPerikatan, "utf-8"), alamatOfferee.getText().toString());
                 MimeMultipart body = pesan.get();
@@ -260,7 +280,7 @@ public class MainActivity extends AppCompatActivity {
 
                 byte[] S = org.bouncycastle.util.Arrays.copyOfRange(ttdnya, 32, 64);//Decode the second half as an integer S, in the range 0 <= s < L
 
-                ttdOfferee.setText("R.X: " + toBigInt(rX).toString() + "\nR.Y: " + toBigInt(rY).toString() + "\nS: " + toBigInt(S).toString());
+                ttdOfferee.setText("R.X: " + toBigInt(rX) + "\nR.Y: " + toBigInt(rY) + "\nS: " + toBigInt(S));
                 offereeCert.checkValidity();
                 boolean hasil = signerInformation.verify(siv);
                 verifikasiTtdOfferee.setText(hasil ? "Pesan dari offeree utuh, tdk termodifikasi" : "termodifikasi");
