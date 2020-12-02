@@ -1,7 +1,5 @@
 package id.menawar.menerima.utility;
 
-
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyFactory;
@@ -33,7 +31,6 @@ public final class DerUtils {
         final CertificateFactory cf = CertificateFactory.getInstance("X.509", "BC25519");
         final X509Certificate cert = (X509Certificate) cf.generateCertificate(is);
         is.close();
-
         return cert;
     }
 

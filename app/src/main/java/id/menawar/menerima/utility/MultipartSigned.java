@@ -11,13 +11,11 @@ import javax.mail.util.ByteArrayDataSource;
 /**
  * Created by dawud_tan on 10/9/17.
  */
-
 public class MultipartSigned extends ContentHandler {
 
     @Override
     public Object getContent(URLConnection urlc) throws IOException {
         try {
-
             return new MimeMultipart(new ByteArrayDataSource(urlc.getInputStream(), urlc.getContentType()));
         } catch (MessagingException e) {
             e.printStackTrace();

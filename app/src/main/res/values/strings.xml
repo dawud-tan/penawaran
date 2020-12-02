@@ -2,4 +2,13 @@
     <string name="app_name">Akta Bawah Tangan</string>
     <string name="penawaran" translatable="false">http://akta-bawah-tangan.ip-dynamic.com</string>
     <string name="alamatOfferee" translatable="false">http://akta-bawah-tangan.ip-dynamic.com/pembentukan-perikatan-elektronik</string>
+    <string name="verifikasiTtdOfferee" translatable="false">Verifikasi TTD Offeree (Penerima)</string>
+    <string name="ttdOfferee" translatable="false"><![CDATA[Tanda Tangan Digital Offeree (Penerima): R & S]]></string>
+    <string name="kunciVerifikasiOfferee" translatable="false">Kunci Verifikasi ttdnya Offeree (Penerima) ed25519</string>
+    <string name="responOfferee" translatable="false">Respon Offeree (Penerima)</string>
+    <string name="ttdOfferor" translatable="false"><![CDATA[Tanda Tangan Digital Offeror (Penawar) ed25519, R & S]]></string>
+    <string name="kunciPenandatangananOfferor" translatable="false">Skalar rahasia \'s\'-nya offeror (penawar), 77 digit</string>
+    <string name="dwimalisasiRedaksiPerikatan" translatable="false">Penyandian Dwimal Redaksi Perikatan</string>
+    <string name="perikatanElektronikPasal18UUITE2008" translatable="false">(sila ketik) Redaksi Perikatan Daring (Pasal 18 UU ITE 2008)</string>
+    <string name="hintAlamatOfferee" translatable="false">Alamat Offeree (Penerima)</string>
 </resources>

@@ -26,7 +26,7 @@
                 style="@style/TextInputLayout.OutlineBox.CustomFont"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Alamat Offeree (Penerima)">
+                android:hint="@string/hintAlamatOfferee">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/alamatOfferee"
@@ -46,7 +46,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ems="10"
-                    android:hint="(sila ketik) Redaksi Perikatan Daring (Pasal 18 UU ITE 2008)"
+                    android:hint="@string/perikatanElektronikPasal18UUITE2008"
                     android:inputType="textMultiLine" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -54,7 +54,7 @@
                 style="@style/TextInputLayout.OutlineBox.CustomFont"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Penyandian Dwimal Redaksi Perikatan">
+                android:hint="@string/dwimalisasiRedaksiPerikatan">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/dwimalisasiRedaksiPerikatan"
@@ -70,7 +70,7 @@
                 style="@style/TextInputLayout.OutlineBox.CustomFont"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Skalar rahasia 's'-nya offeror (penawar), 77 digit">
+                android:hint="@string/kunciPenandatangananOfferor">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/kunciPenandatangananOfferor"
@@ -85,7 +85,7 @@
                 style="@style/TextInputLayout.OutlineBox.CustomFont"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Tanda Tangan Digital Offeror (Penawar) ed25519, R &amp; S">
+                android:hint="@string/ttdOfferor">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/ttdOfferor"
@@ -101,7 +101,7 @@
                 style="@style/TextInputLayout.OutlineBox.CustomFont"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Respon Offeree (Penerima)">
+                android:hint="@string/responOfferee">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/responOfferee"
@@ -117,7 +117,7 @@
                 style="@style/TextInputLayout.OutlineBox.CustomFont"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Kunci Verifikasi ttdnya Offeree (Penerima) ed25519">
+                android:hint="@string/kunciVerifikasiOfferee">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/kunciVerifikasiOfferee"
@@ -132,7 +132,7 @@
                 style="@style/TextInputLayout.OutlineBox.CustomFont"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Tanda Tangan Digital Offeree (Penerima): R &amp; S">
+                android:hint="@string/ttdOfferee">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/ttdOfferee"
@@ -148,7 +148,7 @@
                 style="@style/TextInputLayout.OutlineBox.CustomFont"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Verifikasi TTD Offeree (Penerima)">
+                android:hint="@string/verifikasiTtdOfferee">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/verifikasiTtdOfferee"

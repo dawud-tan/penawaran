@@ -31,11 +31,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -65,8 +65,8 @@ import id.menawar.menerima.utility.PemUtils;
  */
 public class MainActivity extends AppCompatActivity {
     private CoordinatorLayout mCoordinatorLayout;
-    private TextInputEditText alamatOfferee, perikatanElektronikPasal18UUITE2008, dwimalisasiRedaksiPerikatan, kunciPenandatangananOfferor, ttdOfferor, responOfferee, kunciVerifikasiOfferee, ttdOfferee, verifikasiTtdOfferee;
-    private ExecutorService es = Executors.newSingleThreadExecutor();
+    private TextInputEditText alamatOfferee, perikatanElektronikPasal18UUITE2008, dwimalisasiRedaksiPerikatan, ttdOfferor, responOfferee, ttdOfferee, verifikasiTtdOfferee;
+    private final ExecutorService es = Executors.newSingleThreadExecutor();
     private X509Certificate offereeCert;
     private X509Certificate offerorCert;
     private PrivateKey offerorKey;
@@ -110,36 +110,34 @@ public class MainActivity extends AppCompatActivity {
         alamatOfferee = findViewById(R.id.alamatOfferee);
         perikatanElektronikPasal18UUITE2008 = findViewById(R.id.perikatanElektronikPasal18UUITE2008);
         perikatanElektronikPasal18UUITE2008.requestFocus();
-        /**
-         * § 2-201. Formal Requirements; Statute of Frauds.
-         * (1) A contract for the sale of goods for the price of $5,000 or more is not enforceable
-         * by way of action or defense unless there is some record sufficient to indicate that
-         * a contract for sale has been made between the parties and signed by the party against
-         * which enforcement is sought or by the party's authorized agent or broker.
-         * A record is not insufficient because it omits or incorrectly states a term agreed upon
-         * but the contract is not enforceable under this subsection beyond the quantity of goods shown
-         * in the record.
-         *
-         * UCC § 2-201 (1)
-         *
-         * H. Gabriel, L. Rusch and A. Boss, The ABCs of the UCC (Revised) Article 2: Sales. Chicago, IL: ABA, Section of Business Law, 2004.
+        /*
+          § 2-201. Formal Requirements; Statute of Frauds.
+          (1) A contract for the sale of goods for the price of $5,000 or more is not enforceable
+          by way of action or defense unless there is some record sufficient to indicate that
+          a contract for sale has been made between the parties and signed by the party against
+          which enforcement is sought or by the party's authorized agent or broker.
+          A record is not insufficient because it omits or incorrectly states a term agreed upon
+          but the contract is not enforceable under this subsection beyond the quantity of goods shown
+          in the record.
+
+          UCC § 2-201 (1)
+
+          H. Gabriel, L. Rusch and A. Boss, The ABCs of the UCC (Revised) Article 2: Sales. Chicago, IL: ABA, Section of Business Law, 2004.
          */
         perikatanElektronikPasal18UUITE2008.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
             }
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
             }
 
             @Override
             public void afterTextChanged(Editable editable) {
                 try {
                     String redaksi = editable.toString();//"Electronically Stored Information, electronic discovery, Federal Rules of Civil Procedure
-                    byte[] teks = redaksi.getBytes("UTF-8");//"Electronically Stored Information, electronic discovery, Federal Rules of Civil Procedure
+                    byte[] teks = redaksi.getBytes(StandardCharsets.UTF_8);//"Electronically Stored Information, electronic discovery, Federal Rules of Civil Procedure
                     dwimalisasiRedaksiPerikatan.setText(getBinaryString(redaksi));
                     signature.update(teks);
                     byte[] sig = signature.sign();
@@ -155,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
 
                     byte[] S = org.bouncycastle.util.Arrays.copyOfRange(sig, 32, 64);//Decode the second half as an integer S, in the range 0 <= s < L
 
-                    ttdOfferor.setText("R.X: " + toBigInt(rX) + "\nR.Y: " + toBigInt(rY) + "\nS: " + toBigInt(S));
+                    ttdOfferor.setText(new StringBuilder("R.X: ").append(toBigInt(rX)).append("\nR.Y: ").append(toBigInt(rY)).append("\nS: ").append(toBigInt(S)).toString());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -165,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
         dwimalisasiRedaksiPerikatan = findViewById(R.id.dwimalisasiRedaksiPerikatan);
         dwimalisasiRedaksiPerikatan.setText(getBinaryString(perikatanElektronikPasal18UUITE2008.getText().toString()));
 
-        kunciPenandatangananOfferor = findViewById(R.id.kunciPenandatangananOfferor);
+        TextInputEditText kunciPenandatangananOfferor = findViewById(R.id.kunciPenandatangananOfferor);
         try {
             DLTaggedObject priv = (DLTaggedObject) ((DLSequence) new ASN1InputStream(offerorKey.getEncoded()).readObject()).getObjectAt(3);
             digest.reset();
@@ -189,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
 
         ttdOfferor = findViewById(R.id.ttdOfferor);
         try {
-            byte[] larikRedaksiPerikatan = perikatanElektronikPasal18UUITE2008.getText().toString().getBytes("UTF-8");
+            byte[] larikRedaksiPerikatan = perikatanElektronikPasal18UUITE2008.getText().toString().getBytes(StandardCharsets.UTF_8);
             signature.update(larikRedaksiPerikatan);
 
             byte[] sig = signature.sign();
@@ -205,16 +203,14 @@ public class MainActivity extends AppCompatActivity {
 
             byte[] S = org.bouncycastle.util.Arrays.copyOfRange(sig, 32, 64);//Decode the second half as an integer S, in the range 0 <= s < L
 
-            ttdOfferor.setText("R.X: " + toBigInt(rX) + "\nR.Y: " + toBigInt(rY) + "\nS: " + toBigInt(S));
+            ttdOfferor.setText(new StringBuilder("R.X: ").append(toBigInt(rX)).append("\nR.Y: ").append(toBigInt(rY)).append("\nS: ").append(toBigInt(S)).toString());
 
         } catch (SignatureException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
 
         responOfferee = findViewById(R.id.responOfferee);
-        kunciVerifikasiOfferee = findViewById(R.id.kunciVerifikasiOfferee);
+        TextInputEditText kunciVerifikasiOfferee = findViewById(R.id.kunciVerifikasiOfferee);
 
         try {
             DERBitString dbs = (DERBitString) ((DLSequence) new ASN1InputStream(offereeCert.getPublicKey().getEncoded()).readObject()).getObjectAt(1);
@@ -229,7 +225,7 @@ public class MainActivity extends AppCompatActivity {
             X25519Field.encode(pA.y, rY, 0);
             X25519Field.encode(pA.x, rX, 0);
 
-            kunciVerifikasiOfferee.setText("Koordinat X: " + toBigInt(rX) + "\nKoordinat Y:" + toBigInt(rY));
+            kunciVerifikasiOfferee.setText(new StringBuilder("Koordinat X: ").append(toBigInt(rX)).append("\nKoordinat Y:").append(toBigInt(rY)).toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -244,7 +240,7 @@ public class MainActivity extends AppCompatActivity {
                 formValidation();
                 String redaksiPerikatan = perikatanElektronikPasal18UUITE2008.getText().toString();
                 dwimalisasiRedaksiPerikatan.setText(getBinaryString(redaksiPerikatan));
-                signature.update(redaksiPerikatan.getBytes("utf-8"));
+                signature.update(redaksiPerikatan.getBytes(StandardCharsets.UTF_8));
                 byte[] sig = signature.sign();
                 byte[] Rr = org.bouncycastle.util.Arrays.copyOfRange(sig, 0, 32);//Decode the first half as a point R
                 Ed25519.PointAffine pAr = new Ed25519.PointAffine();
@@ -257,7 +253,7 @@ public class MainActivity extends AppCompatActivity {
 
                 byte[] Sr = org.bouncycastle.util.Arrays.copyOfRange(sig, 32, 64);//Decode the second half as an integer S, in the range 0 <= s < L
 
-                ttdOfferor.setText("R.X: " + toBigInt(rXr) + "\nR.Y: " + toBigInt(rYr) + "\nS: " + toBigInt(Sr));
+                ttdOfferor.setText(new StringBuilder("R.X: ").append(toBigInt(rXr)).append("\nR.Y: ").append(toBigInt(rYr)).append("\nS: ").append(toBigInt(Sr)).toString());
 
                 Future<MimeMultipart> pesan = CallSynchronous("redaksiPerikatan=" + URLEncoder.encode(redaksiPerikatan, "utf-8"), alamatOfferee.getText().toString());
                 MimeMultipart body = pesan.get();
@@ -280,7 +276,7 @@ public class MainActivity extends AppCompatActivity {
 
                 byte[] S = org.bouncycastle.util.Arrays.copyOfRange(ttdnya, 32, 64);//Decode the second half as an integer S, in the range 0 <= s < L
 
-                ttdOfferee.setText("R.X: " + toBigInt(rX) + "\nR.Y: " + toBigInt(rY) + "\nS: " + toBigInt(S));
+                ttdOfferee.setText(new StringBuilder("R.X: ").append(toBigInt(rX)).append("\nR.Y: ").append(toBigInt(rY)).append("\nS: ").append(toBigInt(S)).toString());
                 offereeCert.checkValidity();
                 boolean hasil = signerInformation.verify(siv);
                 verifikasiTtdOfferee.setText(hasil ? "Pesan dari offeree utuh, tdk termodifikasi" : "termodifikasi");
@@ -324,8 +320,8 @@ public class MainActivity extends AppCompatActivity {
             con.setRequestProperty("AS2-Version", "1.1");
             con.setRequestProperty("AS2-From", "mycompanyAS2");
             con.setRequestProperty("AS2-To", "mendelsontestAS2");
-            con.setRequestProperty("Subject", "https://s.id/2aYby");
-            con.setRequestProperty("Message-Id", "<github-dawud-tan-" + new SimpleDateFormat("ddMMyyyyHHmmssZ").format(new Date()) + "-" + new Random().nextLong() + "@mycompanyAS2_mendelsontestAS2>");
+            con.setRequestProperty("Subject", "https://s.id/tr1-2");
+            con.setRequestProperty("Message-Id", new StringBuilder("<github-dawud-tan-").append(new SimpleDateFormat("ddMMyyyyHHmmssZ", getCurrentLocale(this)).format(new Date())).append("-").append(new Random().nextLong()).append("@mycompanyAS2_mendelsontestAS2>").toString());
             con.setRequestProperty("Disposition-Notification-To", from);//ask receiving UA, to issue an MDN receipt
             con.setRequestProperty("Disposition-Notification-Options",
                     "signed-receipt-protocol=optional, pkcs7-signature; signed-receipt-micalg=optional, sha512");
@@ -370,19 +366,7 @@ public class MainActivity extends AppCompatActivity {
             //secara default, content-transfer-encoding base64
             gen.setContentTransferEncoding("binary");
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        } catch (NoSuchProviderException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-        } catch (OperatorCreationException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
+        } catch (IOException | CertificateException | NoSuchProviderException | NoSuchAlgorithmException | InvalidKeySpecException | OperatorCreationException | InvalidKeyException e) {
             e.printStackTrace();
         }
     }

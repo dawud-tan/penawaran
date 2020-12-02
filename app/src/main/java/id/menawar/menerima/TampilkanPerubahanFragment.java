@@ -60,12 +60,7 @@ public class TampilkanPerubahanFragment extends AppCompatDialogFragment {
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
             Handler lHandler = new Handler();
-            lHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    wvPage1.scrollTo(0, 1000000000);
-                }
-            }, 200);
+            lHandler.postDelayed(() -> wvPage1.scrollTo(0, 1000000000), 200);
         }
     }
 }
