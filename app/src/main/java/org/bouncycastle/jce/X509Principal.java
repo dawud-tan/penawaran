@@ -46,4 +46,9 @@ public class X509Principal
             throw new RuntimeException(e.toString());
         }
     }
+
+    @Override
+    public String toString() {
+        return super.toString();
+    }
 }

@@ -229,39 +229,39 @@ public class X509Name
      * default look up table translating OID values into their common symbols following
      * the convention in RFC 2253 with a few extras
      */
-    public static final Hashtable DefaultSymbols = new Hashtable();
+    public static final Hashtable<ASN1ObjectIdentifier, String> DefaultSymbols = new Hashtable<>();
 
     /**
      * look up table translating OID values into their common symbols following the convention in RFC 2253
      */
-    public static final Hashtable RFC2253Symbols = new Hashtable();
+    public static final Hashtable<ASN1ObjectIdentifier, String> RFC2253Symbols = new Hashtable<>();
 
     /**
      * look up table translating OID values into their common symbols following the convention in RFC 1779
      */
-    public static final Hashtable RFC1779Symbols = new Hashtable();
+    public static final Hashtable<ASN1ObjectIdentifier, String> RFC1779Symbols = new Hashtable<>();
 
     /**
      * look up table translating common symbols into their OIDS.
      */
-    public static final Hashtable DefaultLookUp = new Hashtable();
+    public static final Hashtable<String, ASN1ObjectIdentifier> DefaultLookUp = new Hashtable<>();
 
     /**
      * look up table translating OID values into their common symbols
      *
      * @deprecated use DefaultSymbols
      */
-    public static final Hashtable OIDLookUp = DefaultSymbols;
+    public static final Hashtable<ASN1ObjectIdentifier, String> OIDLookUp = DefaultSymbols;
 
     /**
      * look up table translating string values into their OIDS -
      *
      * @deprecated use DefaultLookUp
      */
-    public static final Hashtable SymbolLookUp = DefaultLookUp;
+    public static final Hashtable<String, ASN1ObjectIdentifier> SymbolLookUp = DefaultLookUp;
 
-    private static final Boolean TRUE = new Boolean(true); // for J2ME compatibility
-    private static final Boolean FALSE = new Boolean(false);
+    private static final Boolean TRUE = true; // for J2ME compatibility
+    private static final Boolean FALSE = false;
 
     static {
         DefaultSymbols.put(C, "C");
@@ -352,9 +352,9 @@ public class X509Name
     }
 
     private X509NameEntryConverter converter = null;
-    private Vector ordering = new Vector();
-    private Vector values = new Vector();
-    private Vector added = new Vector();
+    private Vector<ASN1ObjectIdentifier> ordering = new Vector<>();
+    private Vector<String> values = new Vector<>();
+    private Vector<Boolean> added = new Vector<>();
 
     private ASN1Sequence seq;
 
@@ -390,10 +390,10 @@ public class X509Name
             ASN1Sequence seq) {
         this.seq = seq;
 
-        Enumeration e = seq.getObjects();
+        Enumeration<ASN1Encodable> e = seq.getObjects();
 
         while (e.hasMoreElements()) {
-            ASN1Set set = ASN1Set.getInstance(((ASN1Encodable) e.nextElement()).toASN1Primitive());
+            ASN1Set set = ASN1Set.getInstance(e.nextElement().toASN1Primitive());
 
             for (int i = 0; i < set.size(); i++) {
                 ASN1Sequence s = ASN1Sequence.getInstance(set.getObjectAt(i).toASN1Primitive());
@@ -438,7 +438,7 @@ public class X509Name
      * @deprecated use an ordered constructor! The hashtable ordering is rarely correct
      */
     public X509Name(
-            Hashtable attributes) {
+            Hashtable<ASN1ObjectIdentifier, String> attributes) {
         this(null, attributes);
     }
 
@@ -451,8 +451,8 @@ public class X509Name
      * in the order they are meant to be encoded or printed in toString.
      */
     public X509Name(
-            Vector ordering,
-            Hashtable attributes) {
+            Vector<ASN1ObjectIdentifier> ordering,
+            Hashtable<ASN1ObjectIdentifier, String> attributes) {
         this(ordering, attributes, new X509DefaultEntryConverter());
     }
 
@@ -470,8 +470,8 @@ public class X509Name
      * @deprecated use X500Name, X500NameBuilder
      */
     public X509Name(
-            Vector ordering,
-            Hashtable attributes,
+            Vector<ASN1ObjectIdentifier> ordering,
+            Hashtable<ASN1ObjectIdentifier, String> attributes,
             X509NameEntryConverter converter) {
         this.converter = converter;
 
@@ -481,7 +481,7 @@ public class X509Name
                 this.added.addElement(FALSE);
             }
         } else {
-            Enumeration e = attributes.keys();
+            Enumeration<ASN1ObjectIdentifier> e = attributes.keys();
 
             while (e.hasMoreElements()) {
                 this.ordering.addElement(e.nextElement());
@@ -490,7 +490,7 @@ public class X509Name
         }
 
         for (int i = 0; i != this.ordering.size(); i++) {
-            ASN1ObjectIdentifier oid = (ASN1ObjectIdentifier) this.ordering.elementAt(i);
+            ASN1ObjectIdentifier oid = this.ordering.elementAt(i);
 
             if (attributes.get(oid) == null) {
                 throw new IllegalArgumentException("No attribute for object id - " + oid.getId() + " - passed to distinguished name");
@@ -506,8 +506,8 @@ public class X509Name
      * @deprecated use X500Name, X500NameBuilder
      */
     public X509Name(
-            Vector oids,
-            Vector values) {
+            Vector<ASN1ObjectIdentifier> oids,
+            Vector<String> values) {
         this(oids, values, new X509DefaultEntryConverter());
     }
 
@@ -520,8 +520,8 @@ public class X509Name
      * @deprecated use X500Name, X500NameBuilder
      */
     public X509Name(
-            Vector oids,
-            Vector values,
+            Vector<ASN1ObjectIdentifier> oids,
+            Vector<String> values,
             X509NameEntryConverter converter) {
         this.converter = converter;
 
@@ -618,14 +618,14 @@ public class X509Name
      */
     public X509Name(
             boolean reverse,
-            Hashtable lookUp,
+            Hashtable<String, ASN1ObjectIdentifier> lookUp,
             String dirName) {
         this(reverse, lookUp, dirName, new X509DefaultEntryConverter());
     }
 
     private ASN1ObjectIdentifier decodeOID(
             String name,
-            Hashtable lookUp) {
+            Hashtable<String, ASN1ObjectIdentifier> lookUp) {
         name = name.trim();
         if (Strings.toUpperCase(name).startsWith("OID.")) {
             return new ASN1ObjectIdentifier(name.substring(4));
@@ -633,7 +633,7 @@ public class X509Name
             return new ASN1ObjectIdentifier(name);
         }
 
-        ASN1ObjectIdentifier oid = (ASN1ObjectIdentifier) lookUp.get(Strings.toLowerCase(name));
+        ASN1ObjectIdentifier oid = lookUp.get(Strings.toLowerCase(name));
         if (oid == null) {
             throw new IllegalArgumentException("Unknown object id - " + name + " - passed to distinguished name");
         }
@@ -715,7 +715,7 @@ public class X509Name
      */
     public X509Name(
             boolean reverse,
-            Hashtable lookUp,
+            Hashtable<String, ASN1ObjectIdentifier> lookUp,
             String dirName,
             X509NameEntryConverter converter) {
         this.converter = converter;
@@ -738,14 +738,14 @@ public class X509Name
         }
 
         if (reverse) {
-            Vector o = new Vector();
-            Vector v = new Vector();
-            Vector a = new Vector();
+            Vector<ASN1ObjectIdentifier> o = new Vector<>();
+            Vector<String> v = new Vector<>();
+            Vector<Boolean> a = new Vector<>();
 
             int count = 1;
 
             for (int i = 0; i < this.ordering.size(); i++) {
-                if (((Boolean) this.added.elementAt(i)).booleanValue()) {
+                if (this.added.elementAt(i)) {
                     o.insertElementAt(this.ordering.elementAt(i), count);
                     v.insertElementAt(this.values.elementAt(i), count);
                     a.insertElementAt(this.added.elementAt(i), count);
@@ -764,7 +764,7 @@ public class X509Name
         }
     }
 
-    private void addEntry(Hashtable lookUp, String token, Boolean isAdded) {
+    private void addEntry(Hashtable<String, ASN1ObjectIdentifier> lookUp, String token, Boolean isAdded) {
         X509NameTokenizer vTok;
         String name;
         String value;
@@ -795,16 +795,16 @@ public class X509Name
 
             for (int i = 0; i != ordering.size(); i++) {
                 ASN1EncodableVector v = new ASN1EncodableVector(2);
-                ASN1ObjectIdentifier oid = (ASN1ObjectIdentifier) ordering.elementAt(i);
+                ASN1ObjectIdentifier oid = ordering.elementAt(i);
 
                 v.add(oid);
 
-                String str = (String) values.elementAt(i);
+                String str = values.elementAt(i);
 
                 v.add(converter.getConvertedValue(oid, str));
 
                 if (lstOid == null
-                        || ((Boolean) this.added.elementAt(i)).booleanValue()) {
+                        || this.added.elementAt(i)) {
                     sVec.add(new DERSequence(v));
                 } else {
                     vec.add(new DERSet(sVec));
@@ -862,12 +862,12 @@ public class X509Name
         }
 
         for (int i = 0; i < orderingSize; i++) {
-            ASN1ObjectIdentifier oid = (ASN1ObjectIdentifier) ordering.elementAt(i);
-            ASN1ObjectIdentifier oOid = (ASN1ObjectIdentifier) other.ordering.elementAt(i);
+            ASN1ObjectIdentifier oid = ordering.elementAt(i);
+            ASN1ObjectIdentifier oOid = other.ordering.elementAt(i);
 
             if (oid.equals(oOid)) {
-                String value = (String) values.elementAt(i);
-                String oValue = (String) other.values.elementAt(i);
+                String value = values.elementAt(i);
+                String oValue = other.values.elementAt(i);
 
                 if (!equivalentStrings(value, oValue)) {
                     return false;
@@ -950,18 +950,18 @@ public class X509Name
 
         for (int i = start; i != end; i += delta) {
             boolean found = false;
-            ASN1ObjectIdentifier oid = (ASN1ObjectIdentifier) ordering.elementAt(i);
-            String value = (String) values.elementAt(i);
+            ASN1ObjectIdentifier oid = ordering.elementAt(i);
+            String value = values.elementAt(i);
 
             for (int j = 0; j < orderingSize; j++) {
                 if (indexes[j]) {
                     continue;
                 }
 
-                ASN1ObjectIdentifier oOid = (ASN1ObjectIdentifier) other.ordering.elementAt(j);
+                ASN1ObjectIdentifier oOid = other.ordering.elementAt(j);
 
                 if (oid.equals(oOid)) {
-                    String oValue = (String) other.values.elementAt(j);
+                    String oValue = other.values.elementAt(j);
 
                     if (equivalentStrings(value, oValue)) {
                         indexes[j] = true;
@@ -1038,10 +1038,10 @@ public class X509Name
 
     private void appendValue(
             StringBuffer buf,
-            Hashtable oidSymbols,
+            Hashtable<ASN1ObjectIdentifier, String> oidSymbols,
             ASN1ObjectIdentifier oid,
             String value) {
-        String sym = (String) oidSymbols.get(oid);
+        String sym = oidSymbols.get(oid);
 
         if (sym != null) {
             buf.append(sym);
@@ -1104,24 +1104,24 @@ public class X509Name
      */
     public String toString(
             boolean reverse,
-            Hashtable oidSymbols) {
+            Hashtable<ASN1ObjectIdentifier, String> oidSymbols) {
         StringBuffer buf = new StringBuffer();
-        Vector components = new Vector();
+        Vector<StringBuffer> components = new Vector<>();
         boolean first = true;
 
         StringBuffer ava = null;
 
         for (int i = 0; i < ordering.size(); i++) {
-            if (((Boolean) added.elementAt(i)).booleanValue()) {
+            if (added.elementAt(i)) {
                 ava.append('+');
                 appendValue(ava, oidSymbols,
-                        (ASN1ObjectIdentifier) ordering.elementAt(i),
-                        (String) values.elementAt(i));
+                        ordering.elementAt(i),
+                        values.elementAt(i));
             } else {
                 ava = new StringBuffer();
                 appendValue(ava, oidSymbols,
-                        (ASN1ObjectIdentifier) ordering.elementAt(i),
-                        (String) values.elementAt(i));
+                        ordering.elementAt(i),
+                        values.elementAt(i));
                 components.addElement(ava);
             }
         }

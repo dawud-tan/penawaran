@@ -16,7 +16,6 @@ import java.security.PrivilegedAction;
 import java.security.Provider;
 import java.security.PublicKey;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 
@@ -52,7 +51,7 @@ public final class BouncyCastleProvider extends Provider
 
     public static final ProviderConfiguration CONFIGURATION = new BouncyCastleProviderConfiguration();
 
-    private static final Map keyInfoConverters = new HashMap();
+    private static final Map<ASN1ObjectIdentifier, AsymmetricKeyInfoConverter> keyInfoConverters = new HashMap<ASN1ObjectIdentifier, AsymmetricKeyInfoConverter>();
 
     /*
      * Configurable asymmetric ciphers
@@ -140,7 +139,7 @@ public final class BouncyCastleProvider extends Provider
 
     private static AsymmetricKeyInfoConverter getAsymmetricKeyInfoConverter(ASN1ObjectIdentifier algorithm) {
         synchronized (keyInfoConverters) {
-            return (AsymmetricKeyInfoConverter) keyInfoConverters.get(algorithm);
+            return keyInfoConverters.get(algorithm);
         }
     }
 
