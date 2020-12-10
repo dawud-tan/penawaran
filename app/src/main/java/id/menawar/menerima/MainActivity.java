@@ -58,6 +58,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
+import java.net.InetAddress ;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -332,8 +333,11 @@ public class MainActivity extends AppCompatActivity {
             output.setContent(aSignedData);
             output.setHeader("Content-Type", aSignedData.getContentType());
             String from = "dawud_tan@merahputih.id";
-
-            HttpURLConnection con = (HttpURLConnection) new URL(alamatPenjual).openConnection();
+            
+            URL urlPenjual = new URL(alamatPenjual);
+            InetAddress alamatIPPenjual = InetAddress.getByName(urlPenjual.getHost());
+            if(alamatIPPenjual.isSiteLocalAddress()) throw new RuntimeException("Alamat IP Penjual privat, tidak bisa dicapai.");
+            HttpURLConnection con = (HttpURLConnection) urlPenjual.openConnection();
             con.setRequestMethod("POST");
             con.setDoInput(true);
             con.setDoOutput(true);
@@ -405,5 +409,14 @@ public class MainActivity extends AppCompatActivity {
             sb.append("\r\n");
         }
         return sb.toString();
+    }
+    
+    public static boolean daringKah() {
+        ConnectivityManager manajerKonektivitas = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo jaringanAktif = manajerKonektivitas.getActiveNetworkInfo();
+        if (jaringanAktif != null && (jaringanAktif.getType() == ConnectivityManager.TYPE_MOBILE || jaringanAktif.getType() == ConnectivityManager.TYPE_WIFI)) {
+                return true;
+        }
+        return false;
     }
 }
