@@ -8,7 +8,8 @@
     <string name="responOfferee" translatable="false">Respon Offeree (Penerima)</string>
     <string name="ttdOfferor" translatable="false"><![CDATA[Tanda Tangan Digital Offeror (Penawar) ed25519, R & S]]></string>
     <string name="kunciPenandatangananOfferor" translatable="false">Skalar rahasia \'s\'-nya offeror (penawar), 77 digit</string>
-    <string name="dwimalisasiRedaksiPerikatan" translatable="false">Penyandian Dwimal Redaksi Perikatan</string>
-    <string name="perikatanElektronikPasal18UUITE2008" translatable="false">(sila ketik) Redaksi Perikatan Daring (Pasal 18 UU ITE 2008)</string>
+    <string name="dwimalisasiRedaksiPenawaran" translatable="false">Penyandian Dwimal Redaksi Penawaran</string>
+    <string name="penawaranElektronikPasal20UUITE2008" translatable="false">(sila ketik) Redaksi Penawaran Elektronik (Pasal 20 UU ITE 2008)</string>
     <string name="hintAlamatOfferee" translatable="false">Alamat Offeree (Penerima)</string>
+    <string name="fab" translatable="false">Kirim</string>
 </resources>

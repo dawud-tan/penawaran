@@ -26,6 +26,8 @@
 package id.menawar.menerima;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
@@ -58,7 +60,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
-import java.net.InetAddress ;
+import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -76,6 +78,7 @@ import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -88,7 +91,7 @@ import id.menawar.menerima.utility.PemUtils;
 
 public class MainActivity extends AppCompatActivity {
     private CoordinatorLayout mCoordinatorLayout;
-    private TextInputEditText alamatOfferee, perikatanElektronikPasal18UUITE2008, dwimalisasiRedaksiPerikatan, ttdOfferor, responOfferee, ttdOfferee, verifikasiTtdOfferee;
+    private TextInputEditText alamatOfferee, penawaranElektronikPasal20UUITE2008, dwimalisasiRedaksiPenawaran, ttdOfferor, responOfferee, ttdOfferee, verifikasiTtdOfferee;
     private final ExecutorService es = Executors.newSingleThreadExecutor();
     private X509Certificate offereeCert;
     private X509Certificate offerorCert;
@@ -131,8 +134,8 @@ public class MainActivity extends AppCompatActivity {
         inisialisasi();
         mCoordinatorLayout = findViewById(R.id.koordinatorLayout);
         alamatOfferee = findViewById(R.id.alamatOfferee);
-        perikatanElektronikPasal18UUITE2008 = findViewById(R.id.perikatanElektronikPasal18UUITE2008);
-        perikatanElektronikPasal18UUITE2008.requestFocus();
+        penawaranElektronikPasal20UUITE2008 = findViewById(R.id.penawaranElektronikPasal20UUITE2008);
+        penawaranElektronikPasal20UUITE2008.requestFocus();
         /*
           § 2-201. Formal Requirements; Statute of Frauds.
           (1) A contract for the sale of goods for the price of $5,000 or more is not enforceable
@@ -147,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
 
           H. Gabriel, L. Rusch and A. Boss, The ABCs of the UCC (Revised) Article 2: Sales. Chicago, IL: ABA, Section of Business Law, 2004.
          */
-        perikatanElektronikPasal18UUITE2008.addTextChangedListener(new TextWatcher() {
+        penawaranElektronikPasal20UUITE2008.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
             }
@@ -161,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     String redaksi = editable.toString();//"Electronically Stored Information, electronic discovery, Federal Rules of Civil Procedure
                     byte[] teks = redaksi.getBytes(StandardCharsets.UTF_8);//"Electronically Stored Information, electronic discovery, Federal Rules of Civil Procedure
-                    dwimalisasiRedaksiPerikatan.setText(getBinaryString(redaksi));
+                    dwimalisasiRedaksiPenawaran.setText(getDvimalString(redaksi));
                     signature.update(teks);
                     byte[] sig = signature.sign();
 
@@ -183,8 +186,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        dwimalisasiRedaksiPerikatan = findViewById(R.id.dwimalisasiRedaksiPerikatan);
-        dwimalisasiRedaksiPerikatan.setText(getBinaryString(perikatanElektronikPasal18UUITE2008.getText().toString()));
+        dwimalisasiRedaksiPenawaran = findViewById(R.id.dwimalisasiRedaksiPenawaran);
+        dwimalisasiRedaksiPenawaran.setText(getDvimalString(penawaranElektronikPasal20UUITE2008.getText().toString()));
 
         TextInputEditText kunciPenandatangananOfferor = findViewById(R.id.kunciPenandatangananOfferor);
         try {
@@ -196,13 +199,25 @@ public class MainActivity extends AppCompatActivity {
             s[0] &= 0xF8;
             s[31] &= 0x7F;
             s[31] |= 0x40;
-            kunciPenandatangananOfferor.setText(toBigInt(s));//kunci pribadi bisa berumur panjang,
-            // compromised setelah dpakai membuat ttd, ttd lama yang sudah terjadi tetap verified kan.
-            // beda dengan kunci publik utk enkripsi
+            kunciPenandatangananOfferor.setText(toBigInt(s));
+            // kunci penandatanganan bisa berumur panjang,
+            // compromised setelah dipakai membuat ttd, ttd lama yang sudah terjadi tetap terverifikasi kan.
+            // beda dengan kunci publik untuk enkripsi
+
+            // Sumber:
+            // N. Borisov, I. Goldberg dan E. Brewer, "Off-the-Record Communication, or, Why Not
+            // To Use PGP", in Proceedings of the 2004 ACM Workshop on Privacy in the Electronic
+            // Society - WPES '04, Yours Truly DC, West End, Washington DC, 2004, hal. 77-84.
+            // Tersedia: http://dl.acm.org/doi/abs/10.1145/1029179.1029200
+
+            //Jum'at, 29 Oktober 2004
+            //03.00-03.25 WITA
+
+            //Yours Truly DC (Place ID: ChIJ13PA3123t4kRzeDA41CDqCI)
+            //jalan New Hampshire 1143 barat laut, West End, Washington, DC, 20037, Amerika Serikat
 
             //kunci pribadi di enkripsi dengan PBKDF2, password based key derivation function
             //atau VERIFIKASI SIGNATURE
-
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -210,7 +225,7 @@ public class MainActivity extends AppCompatActivity {
 
         ttdOfferor = findViewById(R.id.ttdOfferor);
         try {
-            byte[] larikRedaksiPerikatan = perikatanElektronikPasal18UUITE2008.getText().toString().getBytes(StandardCharsets.UTF_8);
+            byte[] larikRedaksiPerikatan = penawaranElektronikPasal20UUITE2008.getText().toString().getBytes(StandardCharsets.UTF_8);
             signature.update(larikRedaksiPerikatan);
 
             byte[] sig = signature.sign();
@@ -261,8 +276,8 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.fab).setOnClickListener(view -> {
             try {
                 formValidation();
-                String redaksiPerikatan = perikatanElektronikPasal18UUITE2008.getText().toString();
-                dwimalisasiRedaksiPerikatan.setText(getBinaryString(redaksiPerikatan));
+                String redaksiPerikatan = penawaranElektronikPasal20UUITE2008.getText().toString();
+                dwimalisasiRedaksiPenawaran.setText(getDvimalString(redaksiPerikatan));
                 signature.update(redaksiPerikatan.getBytes(StandardCharsets.UTF_8));
                 byte[] sig = signature.sign();
                 byte[] Rr = org.bouncycastle.util.Arrays.copyOfRange(sig, 0, 32);//Decode the first half as a point R
@@ -333,10 +348,11 @@ public class MainActivity extends AppCompatActivity {
             output.setContent(aSignedData);
             output.setHeader("Content-Type", aSignedData.getContentType());
             String from = "dawud_tan@merahputih.id";
-            
+
             URL urlPenjual = new URL(alamatPenjual);
             InetAddress alamatIPPenjual = InetAddress.getByName(urlPenjual.getHost());
-            if(alamatIPPenjual.isSiteLocalAddress()) throw new RuntimeException("Alamat IP Penjual privat, tidak bisa dicapai.");
+            if (alamatIPPenjual.isSiteLocalAddress())
+                throw new RuntimeException("Alamat IP Penjual privat, tidak bisa dicapai.");
             HttpURLConnection con = (HttpURLConnection) urlPenjual.openConnection();
             con.setRequestMethod("POST");
             con.setDoInput(true);
@@ -376,7 +392,7 @@ public class MainActivity extends AppCompatActivity {
             offerorCert = PemUtils.decodeCertificate(masukan);
             masukan = MainActivity.class.getResourceAsStream("/offeror.key");//untuk kunci penandatangan pembeli
             offerorKey = PemUtils.decodePrivateKey(masukan, "ED25519");
-            masukan.close();
+            Objects.requireNonNull(masukan).close();
             masukan = null;
 
             siv = new JcaSimpleSignerInfoVerifierBuilder().setProvider("BC25519").build(offereeCert.getPublicKey());
@@ -397,7 +413,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private String getBinaryString(String asal) {
+    private String getDvimalString(String asal) {
         StringBuilder sb = new StringBuilder();
         for (int j = 0; j < asal.length(); j++) {
             String a = asal.substring(j, j + 1);
@@ -410,13 +426,10 @@ public class MainActivity extends AppCompatActivity {
         }
         return sb.toString();
     }
-    
-    public static boolean daringKah() {
+
+    public boolean daringKah() {
         ConnectivityManager manajerKonektivitas = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo jaringanAktif = manajerKonektivitas.getActiveNetworkInfo();
-        if (jaringanAktif != null && (jaringanAktif.getType() == ConnectivityManager.TYPE_MOBILE || jaringanAktif.getType() == ConnectivityManager.TYPE_WIFI)) {
-                return true;
-        }
-        return false;
+        return jaringanAktif != null && (jaringanAktif.getType() == ConnectivityManager.TYPE_MOBILE || jaringanAktif.getType() == ConnectivityManager.TYPE_WIFI);
     }
 }

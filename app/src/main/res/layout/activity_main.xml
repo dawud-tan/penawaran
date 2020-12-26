@@ -42,11 +42,11 @@
                 android:layout_weight="1">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/perikatanElektronikPasal18UUITE2008"
+                    android:id="@+id/penawaranElektronikPasal20UUITE2008"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ems="10"
-                    android:hint="@string/perikatanElektronikPasal18UUITE2008"
+                    android:hint="@string/penawaranElektronikPasal20UUITE2008"
                     android:inputType="textMultiLine" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -54,10 +54,10 @@
                 style="@style/TextInputLayout.OutlineBox.CustomFont"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/dwimalisasiRedaksiPerikatan">
+                android:hint="@string/dwimalisasiRedaksiPenawaran">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/dwimalisasiRedaksiPerikatan"
+                    android:id="@+id/dwimalisasiRedaksiPenawaran"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textMultiLine"
@@ -167,5 +167,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
+        android:contentDescription="@string/fab"
         app:srcCompat="@drawable/baseline_send_24" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
