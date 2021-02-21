@@ -101,6 +101,10 @@ public class MainActivity extends AppCompatActivity {
     private Signature signature;
     private MessageDigest digest;
     Format numberFormat;
+    
+//    static {
+//        System.loadLibrary("frida-gadget");
+//    }
 
     private Locale getCurrentLocale(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
