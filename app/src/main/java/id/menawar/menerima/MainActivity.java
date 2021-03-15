@@ -390,6 +390,8 @@ public class MainActivity extends AppCompatActivity {
     private void inisialisasi() {
         InputStream masukan = MainActivity.class.getResourceAsStream("/offeree.crt");//untuk kunci publik penjual
         try {
+			//KeyInfo.isInsideSecureHardware
+            //KeyInfo.isUserAuthenticationRequirementEnforcedBySecureHardware()
             digest = MessageDigest.getInstance("sha512", "BC25519");
             offereeCert = PemUtils.decodeCertificate(masukan);
             masukan = MainActivity.class.getResourceAsStream("/offeror.crt");//untuk kunci publik pembeli

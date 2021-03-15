@@ -1,5 +1,7 @@
 package org.bouncycastle.mail.smime;
 
+import android.util.Log;
+
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.cms.CMSAlgorithm;
 import org.bouncycastle.cms.CMSException;
@@ -8,10 +10,15 @@ import org.bouncycastle.cms.SignerInfoGenerator;
 import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationStore;
 import org.bouncycastle.mail.smime.util.CRLFOutputStream;
+import org.bouncycastle.util.encoders.Base64;
+import org.bouncycastle.util.io.TeeOutputStream;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.AccessController;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -248,6 +255,7 @@ public class SMIMESignedGenerator
         private final MimeBodyPart content;
         private final boolean encapsulate;
         private final boolean noProvider;
+        MessageDigest digest;
 
         ContentSigner(
                 MimeBodyPart content,
@@ -255,6 +263,13 @@ public class SMIMESignedGenerator
             this.content = content;
             this.encapsulate = encapsulate;
             this.noProvider = true;
+            try {
+                digest = MessageDigest.getInstance("sha512", "BC25519");
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            } catch (NoSuchProviderException e) {
+                e.printStackTrace();
+            }
         }
 
         protected CMSSignedDataStreamGenerator getGenerator()
@@ -316,9 +331,19 @@ public class SMIMESignedGenerator
             try {
                 CMSSignedDataStreamGenerator gen = getGenerator();
                 OutputStream signingStream = gen.open(out, encapsulate);
+                StringBuilder string = new StringBuilder();
+
+                TeeOutputStream ajib = new TeeOutputStream(signingStream, new OutputStream() {
+
+                    @Override
+                    public void write(int b) throws IOException {
+                        string.append((char) b);
+                    }
+
+                });
                 if (content != null) {
                     if (!encapsulate) {
-                        writeBodyPart(signingStream, content);
+                        writeBodyPart(ajib, content);
                     } else {
                         CommandMap commandMap = CommandMap.getDefaultCommandMap();
 
@@ -326,10 +351,12 @@ public class SMIMESignedGenerator
                             content.getDataHandler().setCommandMap(addCommands((MailcapCommandMap) commandMap));
                         }
 
-                        content.writeTo(signingStream);
+                        content.writeTo(ajib);
                     }
                 }
                 signingStream.close();
+                Log.d("berapa: ", "brb: " + string.toString());
+                Log.d("hash: ", "hsh: " + new String(Base64.encode(digest.digest(string.toString().getBytes()))));
             } catch (MessagingException e) {
                 throw new IOException(e.toString());
             } catch (CMSException e) {
