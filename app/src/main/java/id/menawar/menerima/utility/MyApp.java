@@ -26,7 +26,6 @@
 package id.menawar.menerima.utility;
 
 import android.app.Application;
-import android.util.Log;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
@@ -38,7 +37,6 @@ public class MyApp extends Application {
         try {
             Security.addProvider(new BouncyCastleProvider());
         } catch (Exception ex) {
-            Log.e(Application.class.getName(), ex.getMessage());
         }
     }
 

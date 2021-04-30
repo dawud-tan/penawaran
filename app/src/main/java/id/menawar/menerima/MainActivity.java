@@ -39,10 +39,20 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 
+import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.DERBitString;
+import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.DLSequence;
 import org.bouncycastle.asn1.DLTaggedObject;
+import org.bouncycastle.asn1.cms.AttributeTable;
+import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
+import org.bouncycastle.asn1.edec.EdECObjectIdentifiers;
+import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.cms.CMSAttributeTableGenerator;
+import org.bouncycastle.cms.DefaultSignedAttributeTableGenerator;
 import org.bouncycastle.cms.SignerInfoGenerator;
 import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationVerifier;
@@ -53,6 +63,8 @@ import org.bouncycastle.mail.smime.SMIMESignedGenerator;
 import org.bouncycastle.math.ec.rfc7748.X25519Field;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
 import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.util.Arrays;
+import org.bouncycastle.util.encoders.Base64;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -76,7 +88,9 @@ import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.text.Format;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Random;
@@ -99,9 +113,10 @@ public class MainActivity extends AppCompatActivity {
     private SignerInformationVerifier siv;
     private SMIMESignedGenerator gen;
     private Signature signature;
-    private MessageDigest digest;
+    private MessageDigest digest, digestSignedAttr;
     Format numberFormat;
-    
+    HashMap parameters;
+    CMSAttributeTableGenerator sAttrGen;
 //    static {
 //        System.loadLibrary("frida-gadget");
 //    }
@@ -116,8 +131,9 @@ public class MainActivity extends AppCompatActivity {
 
     private String toBigInt(byte[] arr) {
         byte[] rev = new byte[arr.length + 1];
-        for (int i = 0, j = arr.length; j > 0; i++, j--)
+        for (int i = 0, j = arr.length; j > 0; i++, j--) {
             rev[j] = arr[i];
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
             return ((android.icu.text.DecimalFormat) numberFormat).format(new BigInteger(1, rev));
         else
@@ -140,6 +156,19 @@ public class MainActivity extends AppCompatActivity {
         alamatOfferee = findViewById(R.id.alamatOfferee);
         penawaranElektronikPasal20UUITE2008 = findViewById(R.id.penawaranElektronikPasal20UUITE2008);
         penawaranElektronikPasal20UUITE2008.requestFocus();
+        sAttrGen = new DefaultSignedAttributeTableGenerator();
+
+        parameters = new HashMap();
+        parameters.put(CMSAttributeTableGenerator.CONTENT_TYPE, CMSObjectIdentifiers.data);
+        parameters.put(CMSAttributeTableGenerator.DIGEST_ALGORITHM_IDENTIFIER, new AlgorithmIdentifier(NISTObjectIdentifiers.id_sha512));
+        parameters.put(CMSAttributeTableGenerator.SIGNATURE_ALGORITHM_IDENTIFIER, new AlgorithmIdentifier(EdECObjectIdentifiers.id_Ed25519));
+        try {
+            digestSignedAttr = MessageDigest.getInstance("sha512", "BC25519");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (NoSuchProviderException e) {
+            e.printStackTrace();
+        }
         /*
           § 2-201. Formal Requirements; Statute of Frauds.
           (1) A contract for the sale of goods for the price of $5,000 or more is not enforceable
@@ -166,24 +195,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable editable) {
                 try {
-                    String redaksi = editable.toString();//"Electronically Stored Information, electronic discovery, Federal Rules of Civil Procedure
-                    byte[] teks = redaksi.getBytes(StandardCharsets.UTF_8);//"Electronically Stored Information, electronic discovery, Federal Rules of Civil Procedure
-                    dwimalisasiRedaksiPenawaran.setText(getDvimalString(redaksi));
-                    signature.update(teks);
-                    byte[] sig = signature.sign();
-
-                    byte[] R = org.bouncycastle.util.Arrays.copyOfRange(sig, 0, 32);//Decode the first half as a point R
-                    Ed25519.PointAffine pAra = new Ed25519.PointAffine();
-                    Ed25519.decodePointVar(R, 0, false, pAra);
-
-                    byte[] rX = new byte[Ed25519.PUBLIC_KEY_SIZE];
-                    byte[] rY = new byte[Ed25519.PUBLIC_KEY_SIZE];
-                    X25519Field.encode(pAra.y, rY, 0);
-                    X25519Field.encode(pAra.x, rX, 0);
-
-                    byte[] S = org.bouncycastle.util.Arrays.copyOfRange(sig, 32, 64);//Decode the second half as an integer S, in the range 0 <= s < L
-
-                    ttdOfferor.setText(new StringBuilder("R.X: ").append(toBigInt(rX)).append("\nR.Y: ").append(toBigInt(rY)).append("\nS: ").append(toBigInt(S)).toString());
+                    dwimalisasiRedaksiPenawaran.setText(getDvimalString(editable.toString()));
+                    ttdOfferor.setText(tandatangannyaOfferor(editable.toString()));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -229,25 +242,8 @@ public class MainActivity extends AppCompatActivity {
 
         ttdOfferor = findViewById(R.id.ttdOfferor);
         try {
-            byte[] larikRedaksiPerikatan = penawaranElektronikPasal20UUITE2008.getText().toString().getBytes(StandardCharsets.UTF_8);
-            signature.update(larikRedaksiPerikatan);
-
-            byte[] sig = signature.sign();
-
-            byte[] R = org.bouncycastle.util.Arrays.copyOfRange(sig, 0, 32);//Decode the first half as a point R
-            Ed25519.PointAffine pAra = new Ed25519.PointAffine();
-            Ed25519.decodePointVar(R, 0, false, pAra);
-
-            byte[] rX = new byte[Ed25519.PUBLIC_KEY_SIZE];
-            byte[] rY = new byte[Ed25519.PUBLIC_KEY_SIZE];
-            X25519Field.encode(pAra.y, rY, 0);
-            X25519Field.encode(pAra.x, rX, 0);
-
-            byte[] S = org.bouncycastle.util.Arrays.copyOfRange(sig, 32, 64);//Decode the second half as an integer S, in the range 0 <= s < L
-
-            ttdOfferor.setText(new StringBuilder("R.X: ").append(toBigInt(rX)).append("\nR.Y: ").append(toBigInt(rY)).append("\nS: ").append(toBigInt(S)).toString());
-
-        } catch (SignatureException e) {
+            ttdOfferor.setText(tandatangannyaOfferor(penawaranElektronikPasal20UUITE2008.getText().toString()));
+        } catch (SignatureException | IOException e) {
             e.printStackTrace();
         }
 
@@ -282,20 +278,6 @@ public class MainActivity extends AppCompatActivity {
                 formValidation();
                 String redaksiPerikatan = penawaranElektronikPasal20UUITE2008.getText().toString();
                 dwimalisasiRedaksiPenawaran.setText(getDvimalString(redaksiPerikatan));
-                signature.update(redaksiPerikatan.getBytes(StandardCharsets.UTF_8));
-                byte[] sig = signature.sign();
-                byte[] Rr = org.bouncycastle.util.Arrays.copyOfRange(sig, 0, 32);//Decode the first half as a point R
-                Ed25519.PointAffine pAr = new Ed25519.PointAffine();
-                Ed25519.decodePointVar(Rr, 0, false, pAr);
-
-                byte[] rXr = new byte[Ed25519.PUBLIC_KEY_SIZE];
-                byte[] rYr = new byte[Ed25519.PUBLIC_KEY_SIZE];
-                X25519Field.encode(pAr.y, rYr, 0);
-                X25519Field.encode(pAr.x, rXr, 0);
-
-                byte[] Sr = org.bouncycastle.util.Arrays.copyOfRange(sig, 32, 64);//Decode the second half as an integer S, in the range 0 <= s < L
-
-                ttdOfferor.setText(new StringBuilder("R.X: ").append(toBigInt(rXr)).append("\nR.Y: ").append(toBigInt(rYr)).append("\nS: ").append(toBigInt(Sr)).toString());
 
                 Future<MimeMultipart> pesan = CallSynchronous("redaksiPerikatan=" + URLEncoder.encode(redaksiPerikatan, "utf-8"), alamatOfferee.getText().toString());
                 MimeMultipart body = pesan.get();
@@ -330,6 +312,31 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private String tandatangannyaOfferor(String redaksinya) throws IOException, SignatureException {
+        StringBuilder redaksi = new StringBuilder("Content-Type: application/x-www-form-urlencoded; charset=UTF-8\r\n" +
+                "Content-Transfer-Encoding: binary\r\n\r\n");
+        redaksi.append("redaksiPerikatan=");
+        redaksi.append(URLEncoder.encode(redaksinya, "utf-8"));//"Electronically Stored Information, electronic discovery, Federal Rules of Civil Procedure
+        digestSignedAttr.reset();
+        byte[] digest = digestSignedAttr.digest(redaksi.toString().getBytes(StandardCharsets.UTF_8));
+        parameters.put(CMSAttributeTableGenerator.DIGEST, Arrays.clone(digest));
+        AttributeTable signed = sAttrGen.getAttributes(Collections.unmodifiableMap(parameters));
+        ASN1Set signedAttr = new DERSet(signed.toASN1EncodableVector());
+        byte[] teks = signedAttr.getEncoded(ASN1Encoding.DER);//"Electronically Stored Information, electronic discovery, Federal Rules of Civil Procedure
+        signature.update(teks);
+        byte[] sig = signature.sign();
+        byte[] R = org.bouncycastle.util.Arrays.copyOfRange(sig, 0, 32);//Decode the first half as a point R
+        Ed25519.PointAffine pAra = new Ed25519.PointAffine();
+        Ed25519.decodePointVar(R, 0, false, pAra);
+        byte[] rX = new byte[Ed25519.PUBLIC_KEY_SIZE];
+        byte[] rY = new byte[Ed25519.PUBLIC_KEY_SIZE];
+        X25519Field.encode(pAra.y, rY, 0);
+        X25519Field.encode(pAra.x, rX, 0);
+        byte[] S = org.bouncycastle.util.Arrays.copyOfRange(sig, 32, 64);//Decode the second half as an integer S, in the range 0 <= s < L
+        return new StringBuilder("R.X: ").append(toBigInt(rX))
+                .append("\nR.Y: ").append(toBigInt(rY))
+                .append("\nS: ").append(toBigInt(S)).toString();
+    }
 
     private void formValidation() throws Exception {
         //validasi form
@@ -390,7 +397,7 @@ public class MainActivity extends AppCompatActivity {
     private void inisialisasi() {
         InputStream masukan = MainActivity.class.getResourceAsStream("/offeree.crt");//untuk kunci publik penjual
         try {
-			//KeyInfo.isInsideSecureHardware
+            //KeyInfo.isInsideSecureHardware
             //KeyInfo.isUserAuthenticationRequirementEnforcedBySecureHardware()
             digest = MessageDigest.getInstance("sha512", "BC25519");
             offereeCert = PemUtils.decodeCertificate(masukan);

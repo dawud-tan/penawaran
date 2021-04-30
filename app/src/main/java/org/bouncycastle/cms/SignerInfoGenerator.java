@@ -1,14 +1,10 @@
 package org.bouncycastle.cms;
 
-import android.util.Log;
-
 import org.bouncycastle.asn1.ASN1Encoding;
-import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSet;
-import org.bouncycastle.asn1.DLSet;
 import org.bouncycastle.asn1.cms.AttributeTable;
 import org.bouncycastle.asn1.cms.SignerIdentifier;
 import org.bouncycastle.asn1.cms.SignerInfo;
@@ -21,13 +17,11 @@ import org.bouncycastle.operator.DigestCalculator;
 import org.bouncycastle.operator.DigestCalculatorProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.Arrays;
-import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.io.TeeOutputStream;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -146,7 +140,6 @@ public class SignerInfoGenerator {
             if (sAttrGen != null) {
                 digestAlg = digester.getAlgorithmIdentifier();
                 calculatedDigest = digester.getDigest();
-                Log.d("digest", new String(Base64.encode(calculatedDigest)));
                 Map parameters = getBaseParameters(contentType, digester.getAlgorithmIdentifier(), digestEncryptionAlgorithm, calculatedDigest);
                 AttributeTable signed = sAttrGen.getAttributes(Collections.unmodifiableMap(parameters));
 
@@ -154,13 +147,7 @@ public class SignerInfoGenerator {
 
                 // sig must be composed from the DER encoding.
                 OutputStream sOut = signer.getOutputStream();
-
-                byte[] asik = signedAttr.getEncoded(ASN1Encoding.DER);
-                DLSet prim = (DLSet) new ASN1InputStream(asik).readObject();
-                Enumeration e = prim.getObjects();
-                Collections.list(e).forEach(d -> Log.d("kls", "kelas: " + d.getClass().getCanonicalName()));
-                Log.d("ASN1Primitive", "nama kelas: " + prim.getClass().getCanonicalName());
-                sOut.write(asik);
+                sOut.write(signedAttr.getEncoded(ASN1Encoding.DER));
 
                 sOut.close();
             } else {

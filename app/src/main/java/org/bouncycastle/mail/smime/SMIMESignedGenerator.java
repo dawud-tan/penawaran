@@ -1,7 +1,5 @@
 package org.bouncycastle.mail.smime;
 
-import android.util.Log;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.cms.CMSAlgorithm;
 import org.bouncycastle.cms.CMSException;
@@ -10,7 +8,6 @@ import org.bouncycastle.cms.SignerInfoGenerator;
 import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationStore;
 import org.bouncycastle.mail.smime.util.CRLFOutputStream;
-import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.io.TeeOutputStream;
 
 import java.io.IOException;
@@ -355,8 +352,6 @@ public class SMIMESignedGenerator
                     }
                 }
                 signingStream.close();
-                Log.d("berapa: ", "brb: " + string.toString());
-                Log.d("hash: ", "hsh: " + new String(Base64.encode(digest.digest(string.toString().getBytes()))));
             } catch (MessagingException e) {
                 throw new IOException(e.toString());
             } catch (CMSException e) {
