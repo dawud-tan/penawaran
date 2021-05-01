@@ -64,7 +64,6 @@ import org.bouncycastle.math.ec.rfc7748.X25519Field;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.Arrays;
-import org.bouncycastle.util.encoders.Base64;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

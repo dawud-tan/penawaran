@@ -247,7 +247,7 @@ public class SMIMESignedGenerator
         return make(makeContentBodyPart(content));
     }
 
-    private class ContentSigner
+    public class ContentSigner
             implements SMIMEStreamingProcessor {
         private final MimeBodyPart content;
         private final boolean encapsulate;
@@ -328,27 +328,15 @@ public class SMIMESignedGenerator
             try {
                 CMSSignedDataStreamGenerator gen = getGenerator();
                 OutputStream signingStream = gen.open(out, encapsulate);
-                StringBuilder string = new StringBuilder();
-
-                TeeOutputStream ajib = new TeeOutputStream(signingStream, new OutputStream() {
-
-                    @Override
-                    public void write(int b) throws IOException {
-                        string.append((char) b);
-                    }
-
-                });
                 if (content != null) {
                     if (!encapsulate) {
-                        writeBodyPart(ajib, content);
+                        writeBodyPart(signingStream, content);
                     } else {
                         CommandMap commandMap = CommandMap.getDefaultCommandMap();
-
                         if (commandMap instanceof MailcapCommandMap) {
                             content.getDataHandler().setCommandMap(addCommands((MailcapCommandMap) commandMap));
                         }
-
-                        content.writeTo(ajib);
+                        content.writeTo(signingStream);
                     }
                 }
                 signingStream.close();
