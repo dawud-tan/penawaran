@@ -1,6 +1,7 @@
 package org.bouncycastle.operator.jcajce;
 
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.jcajce.util.JcaJceHelper;
 import org.bouncycastle.jcajce.util.MessageDigestUtils;
@@ -19,6 +20,7 @@ class OperatorHelper {
         //
         // reverse mappings
         //
+        oids.put(PKCSObjectIdentifiers.sha512WithRSAEncryption, "SHA512WITHRSA");
         oids.put(NISTObjectIdentifiers.id_sha512, "SHA512");
     }
 
@@ -39,8 +41,7 @@ class OperatorHelper {
             // try an alternate
             //
             if (oids.get(digAlgId.getAlgorithm()) != null) {
-                String digestAlgorithm = "SHA512";
-
+                String digestAlgorithm = (String) oids.get(digAlgId.getAlgorithm());
                 dig = helper.createMessageDigest(digestAlgorithm);
             } else {
                 throw e;

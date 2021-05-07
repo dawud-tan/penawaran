@@ -8,14 +8,10 @@ import org.bouncycastle.cms.SignerInfoGenerator;
 import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationStore;
 import org.bouncycastle.mail.smime.util.CRLFOutputStream;
-import org.bouncycastle.util.io.TeeOutputStream;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.AccessController;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -252,7 +248,6 @@ public class SMIMESignedGenerator
         private final MimeBodyPart content;
         private final boolean encapsulate;
         private final boolean noProvider;
-        MessageDigest digest;
 
         ContentSigner(
                 MimeBodyPart content,
@@ -260,13 +255,6 @@ public class SMIMESignedGenerator
             this.content = content;
             this.encapsulate = encapsulate;
             this.noProvider = true;
-            try {
-                digest = MessageDigest.getInstance("sha512", "BC25519");
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-            } catch (NoSuchProviderException e) {
-                e.printStackTrace();
-            }
         }
 
         protected CMSSignedDataStreamGenerator getGenerator()

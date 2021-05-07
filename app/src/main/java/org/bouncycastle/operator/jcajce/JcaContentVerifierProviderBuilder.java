@@ -1,13 +1,10 @@
 package org.bouncycastle.operator.jcajce;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.bouncycastle.jcajce.io.OutputStreamFactory;
 import org.bouncycastle.jcajce.util.DefaultJcaJceHelper;
-import org.bouncycastle.jcajce.util.NamedJcaJceHelper;
-import org.bouncycastle.jcajce.util.ProviderJcaJceHelper;
 import org.bouncycastle.operator.ContentVerifier;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.OperatorCreationException;
@@ -16,12 +13,10 @@ import org.bouncycastle.operator.RuntimeOperatorException;
 
 import java.io.OutputStream;
 import java.security.GeneralSecurityException;
-import java.security.Provider;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 public class JcaContentVerifierProviderBuilder {
@@ -29,14 +24,6 @@ public class JcaContentVerifierProviderBuilder {
 
     public JcaContentVerifierProviderBuilder() {
     }
-
-
-    public JcaContentVerifierProviderBuilder setProvider(String providerName) {
-        this.helper = new OperatorHelper(new NamedJcaJceHelper(providerName));
-
-        return this;
-    }
-
 
     public ContentVerifierProvider build(final X509Certificate certificate)
             throws OperatorCreationException {

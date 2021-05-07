@@ -11,7 +11,10 @@ public interface PKCSObjectIdentifiers {
      * PKCS#1: 1.2.840.113549.1.1
      */
     ASN1ObjectIdentifier pkcs_1 = new ASN1ObjectIdentifier("1.2.840.113549.1.1");
-
+    /**
+     * PKCS#1: 1.2.840.113549.1.1.1
+     */
+    ASN1ObjectIdentifier rsaEncryption = pkcs_1.branch("1");
     /**
      * PKCS#1: 1.2.840.113549.1.1.8
      */
@@ -20,7 +23,10 @@ public interface PKCSObjectIdentifiers {
      * PKCS#1: 1.2.840.113549.1.1.9
      */
     ASN1ObjectIdentifier id_pSpecified = pkcs_1.branch("9");
-
+    /**
+     * PKCS#1: 1.2.840.113549.1.1.13
+     */
+    ASN1ObjectIdentifier sha512WithRSAEncryption = pkcs_1.branch("13");
 
     /**
      * PKCS#7: 1.2.840.113549.1.7.1

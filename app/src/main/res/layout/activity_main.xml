@@ -70,21 +70,6 @@
                 style="@style/TextInputLayout.OutlineBox.CustomFont"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/kunciPenandatangananOfferor">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/kunciPenandatangananOfferor"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="none"
-                    android:scrollbars="vertical" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/TextInputLayout.OutlineBox.CustomFont"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:hint="@string/ttdOfferor">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -124,6 +109,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="none"
+                    android:maxLines="3"
                     android:scrollbars="vertical" />
 
             </com.google.android.material.textfield.TextInputLayout>

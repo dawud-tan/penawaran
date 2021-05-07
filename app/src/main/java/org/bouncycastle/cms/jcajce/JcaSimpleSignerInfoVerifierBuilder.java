@@ -14,14 +14,6 @@ import java.security.PublicKey;
 public class JcaSimpleSignerInfoVerifierBuilder {
     private Helper helper = new Helper();
 
-
-    public JcaSimpleSignerInfoVerifierBuilder setProvider(String providerName) {
-        this.helper = new NamedHelper(providerName);
-
-        return this;
-    }
-
-
     public SignerInformationVerifier build(PublicKey pubKey)
             throws OperatorCreationException {
         return new SignerInformationVerifier(new DefaultCMSSignatureAlgorithmNameGenerator(), new DefaultSignatureAlgorithmIdentifierFinder(), helper.createContentVerifierProvider(pubKey), helper.createDigestCalculatorProvider());
@@ -38,26 +30,5 @@ public class JcaSimpleSignerInfoVerifierBuilder {
                 throws OperatorCreationException {
             return new JcaDigestCalculatorProviderBuilder().build();
         }
-    }
-
-    private class NamedHelper
-            extends Helper {
-        private final String providerName;
-
-        public NamedHelper(String providerName) {
-            this.providerName = providerName;
-        }
-
-        ContentVerifierProvider createContentVerifierProvider(PublicKey publicKey)
-                throws OperatorCreationException {
-            return new JcaContentVerifierProviderBuilder().setProvider(providerName).build(publicKey);
-        }
-
-
-        DigestCalculatorProvider createDigestCalculatorProvider()
-                throws OperatorCreationException {
-            return new JcaDigestCalculatorProviderBuilder().setProvider(providerName).build();
-        }
-
     }
 }

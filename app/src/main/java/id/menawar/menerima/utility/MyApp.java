@@ -27,18 +27,9 @@ package id.menawar.menerima.utility;
 
 import android.app.Application;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
 import java.net.URLConnection;
-import java.security.Security;
 
 public class MyApp extends Application {
-    static {
-        try {
-            Security.addProvider(new BouncyCastleProvider());
-        } catch (Exception ex) {
-        }
-    }
 
     @Override
     public void onCreate() {

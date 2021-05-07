@@ -2,12 +2,12 @@
     <string name="app_name">Akta Bawah Tangan</string>
     <string name="penawaran" translatable="false">http://akta-bawah-tangan.ip-dynamic.com</string>
     <string name="alamatOfferee" translatable="false">http://akta-bawah-tangan.ip-dynamic.com/pembentukan-perikatan-elektronik</string>
+    <string name="tambahSertifikat" translatable="false">http://akta-bawah-tangan.ip-dynamic.com/daftarkan-kunci-publik-pengguna</string>
     <string name="verifikasiTtdOfferee" translatable="false">Verifikasi TTD Offeree (Penerima)</string>
-    <string name="ttdOfferee" translatable="false"><![CDATA[Tanda Tangan Digital Offeree (Penerima): R & S]]></string>
-    <string name="kunciVerifikasiOfferee" translatable="false">Kunci Verifikasi ttdnya Offeree (Penerima) ed25519</string>
+    <string name="ttdOfferee" translatable="false"><![CDATA[TTD Digital Penerima RSASSA-PKCS1-v1_5, emsa^d mod n]]></string>
+    <string name="kunciVerifikasiOfferee" translatable="false">Modulus verifikasinya Offeree (Penerima)</string>
     <string name="responOfferee" translatable="false">Respon Offeree (Penerima)</string>
-    <string name="ttdOfferor" translatable="false"><![CDATA[Tanda Tangan Digital Offeror (Penawar) ed25519, R & S]]></string>
-    <string name="kunciPenandatangananOfferor" translatable="false">Skalar rahasia \'s\'-nya offeror (penawar), 77 digit</string>
+    <string name="ttdOfferor" translatable="false"><![CDATA[TTD Digital Penawar RSASSA-PKCS1-v1_5, emsa^d mod n]]></string>
     <string name="dwimalisasiRedaksiPenawaran" translatable="false">Penyandian Dwimal Redaksi Penawaran</string>
     <string name="penawaranElektronikPasal20UUITE2008" translatable="false">(sila ketik) Redaksi Penawaran Elektronik (Pasal 20 UU ITE 2008)</string>
     <string name="hintAlamatOfferee" translatable="false">Alamat Offeree (Penerima)</string>

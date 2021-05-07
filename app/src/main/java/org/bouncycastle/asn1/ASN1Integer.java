@@ -118,6 +118,16 @@ public class ASN1Integer
         this.start = signBytesToSkip(bytes);
     }
 
+    /**
+     * in some cases positive values get crammed into a space,
+     * that's not quite big enough...
+     *
+     * @return the BigInteger that results from treating this ASN.1 INTEGER as unsigned.
+     */
+    public BigInteger getPositiveValue() {
+        return new BigInteger(1, bytes);
+    }
+
     public BigInteger getValue() {
         return new BigInteger(bytes);
     }

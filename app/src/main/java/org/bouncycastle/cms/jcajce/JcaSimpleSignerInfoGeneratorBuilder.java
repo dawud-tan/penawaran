@@ -1,7 +1,6 @@
 package org.bouncycastle.cms.jcajce;
 
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
-import org.bouncycastle.cms.CMSAttributeTableGenerator;
 import org.bouncycastle.cms.SignerInfoGenerator;
 import org.bouncycastle.cms.SignerInfoGeneratorBuilder;
 import org.bouncycastle.operator.ContentSigner;
@@ -11,7 +10,6 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 
 import java.security.PrivateKey;
-import java.security.Provider;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
@@ -42,20 +40,8 @@ import java.security.cert.X509Certificate;
 public class JcaSimpleSignerInfoGeneratorBuilder {
     private Helper helper;
 
-    private boolean hasNoSignedAttributes;
-    private CMSAttributeTableGenerator signedGen;
-    private CMSAttributeTableGenerator unsignedGen;
-
-    public JcaSimpleSignerInfoGeneratorBuilder()
-            throws OperatorCreationException {
+    public JcaSimpleSignerInfoGeneratorBuilder() {
         this.helper = new Helper();
-    }
-
-    public JcaSimpleSignerInfoGeneratorBuilder setProvider(String providerName)
-            throws OperatorCreationException {
-        this.helper = new NamedHelper(providerName);
-
-        return this;
     }
 
     public SignerInfoGenerator build(String algorithmName, PrivateKey privateKey, X509Certificate certificate)
@@ -69,11 +55,6 @@ public class JcaSimpleSignerInfoGeneratorBuilder {
     private SignerInfoGeneratorBuilder configureAndBuild()
             throws OperatorCreationException {
         SignerInfoGeneratorBuilder infoGeneratorBuilder = new SignerInfoGeneratorBuilder(helper.createDigestCalculatorProvider());
-
-        infoGeneratorBuilder.setDirectSignature(hasNoSignedAttributes);
-        infoGeneratorBuilder.setSignedAttributeGenerator(signedGen);
-        infoGeneratorBuilder.setUnsignedAttributeGenerator(unsignedGen);
-
         return infoGeneratorBuilder;
     }
 
@@ -89,25 +70,4 @@ public class JcaSimpleSignerInfoGeneratorBuilder {
             return new JcaDigestCalculatorProviderBuilder().build();
         }
     }
-
-    private class NamedHelper
-            extends Helper {
-        private final String providerName;
-
-        public NamedHelper(String providerName) {
-            this.providerName = providerName;
-        }
-
-        ContentSigner createContentSigner(String algorithm, PrivateKey privateKey)
-                throws OperatorCreationException {
-            privateKey = CMSUtils.cleanPrivateKey(privateKey);
-            return new JcaContentSignerBuilder(algorithm).setProvider(providerName).build(privateKey);
-        }
-
-        DigestCalculatorProvider createDigestCalculatorProvider()
-                throws OperatorCreationException {
-            return new JcaDigestCalculatorProviderBuilder().setProvider(providerName).build();
-        }
-    }
-
 }

@@ -26,10 +26,14 @@
 package id.menawar.menerima;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.security.KeyPairGeneratorSpec;
+import android.security.keystore.KeyGenParameterSpec;
+import android.security.keystore.KeyProperties;
 import android.text.Editable;
 import android.text.TextWatcher;
 
@@ -41,15 +45,16 @@ import com.google.android.material.textfield.TextInputEditText;
 
 import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.DERBitString;
+import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.DLSequence;
-import org.bouncycastle.asn1.DLTaggedObject;
 import org.bouncycastle.asn1.cms.AttributeTable;
 import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
-import org.bouncycastle.asn1.edec.EdECObjectIdentifiers;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.cms.CMSAttributeTableGenerator;
 import org.bouncycastle.cms.DefaultSignedAttributeTableGenerator;
@@ -60,12 +65,11 @@ import org.bouncycastle.cms.jcajce.JcaSimpleSignerInfoGeneratorBuilder;
 import org.bouncycastle.cms.jcajce.JcaSimpleSignerInfoVerifierBuilder;
 import org.bouncycastle.mail.smime.SMIMESigned;
 import org.bouncycastle.mail.smime.SMIMESignedGenerator;
-import org.bouncycastle.math.ec.rfc7748.X25519Field;
-import org.bouncycastle.math.ec.rfc8032.Ed25519;
-import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.Arrays;
+import org.bouncycastle.util.encoders.Base64;
 
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -74,31 +78,34 @@ import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.security.InvalidKeyException;
+import java.security.KeyPairGenerator;
+import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.Signature;
-import java.security.SignatureException;
-import java.security.cert.CertificateException;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
-import java.security.spec.InvalidKeySpecException;
+import java.security.spec.AlgorithmParameterSpec;
 import java.text.Format;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
+import javax.security.auth.x500.X500Principal;
 
 import id.menawar.menerima.utility.PemUtils;
 
@@ -113,9 +120,13 @@ public class MainActivity extends AppCompatActivity {
     private SMIMESignedGenerator gen;
     private Signature signature;
     private MessageDigest digest, digestSignedAttr;
-    Format numberFormat;
-    HashMap parameters;
-    CMSAttributeTableGenerator sAttrGen;
+    private Format numberFormat;
+    private HashMap parameters;
+    private CMSAttributeTableGenerator sAttrGen;
+    private static String KEY_NAME = "pasangan_kunci";
+    private static String FIRST = "pertama-kali-pasang";
+    private String uniqueID;
+
 //    static {
 //        System.loadLibrary("frida-gadget");
 //    }
@@ -128,15 +139,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private String toBigInt(byte[] arr) {
-        byte[] rev = new byte[arr.length + 1];
-        for (int i = 0, j = arr.length; j > 0; i++, j--) {
-            rev[j] = arr[i];
-        }
+    private String bigIntToString(BigInteger big) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-            return ((android.icu.text.DecimalFormat) numberFormat).format(new BigInteger(1, rev));
+            return ((android.icu.text.DecimalFormat) numberFormat).format(big);
         else
-            return ((java.text.DecimalFormat) numberFormat).format(new BigInteger(1, rev));
+            return ((java.text.DecimalFormat) numberFormat).format(big);
     }
 
     @Override
@@ -159,13 +166,12 @@ public class MainActivity extends AppCompatActivity {
 
         parameters = new HashMap();
         parameters.put(CMSAttributeTableGenerator.CONTENT_TYPE, CMSObjectIdentifiers.data);
-        parameters.put(CMSAttributeTableGenerator.DIGEST_ALGORITHM_IDENTIFIER, new AlgorithmIdentifier(NISTObjectIdentifiers.id_sha512));
-        parameters.put(CMSAttributeTableGenerator.SIGNATURE_ALGORITHM_IDENTIFIER, new AlgorithmIdentifier(EdECObjectIdentifiers.id_Ed25519));
+        parameters.put(CMSAttributeTableGenerator.DIGEST_ALGORITHM_IDENTIFIER, new AlgorithmIdentifier(NISTObjectIdentifiers.id_sha512, DERNull.INSTANCE));
+        parameters.put(CMSAttributeTableGenerator.SIGNATURE_ALGORITHM_IDENTIFIER, new AlgorithmIdentifier(PKCSObjectIdentifiers.sha512WithRSAEncryption, DERNull.INSTANCE));
+
         try {
-            digestSignedAttr = MessageDigest.getInstance("sha512", "BC25519");
+            digestSignedAttr = MessageDigest.getInstance("SHA512");
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (NoSuchProviderException e) {
             e.printStackTrace();
         }
         /*
@@ -205,44 +211,12 @@ public class MainActivity extends AppCompatActivity {
         dwimalisasiRedaksiPenawaran = findViewById(R.id.dwimalisasiRedaksiPenawaran);
         dwimalisasiRedaksiPenawaran.setText(getDvimalString(penawaranElektronikPasal20UUITE2008.getText().toString()));
 
-        TextInputEditText kunciPenandatangananOfferor = findViewById(R.id.kunciPenandatangananOfferor);
-        try {
-            DLTaggedObject priv = (DLTaggedObject) ((DLSequence) new ASN1InputStream(offerorKey.getEncoded()).readObject()).getObjectAt(3);
-            digest.reset();
-            byte[] h = digest.digest(priv.getEncoded());
-            byte[] s = new byte[32];
-            System.arraycopy(h, 0, s, 0, 32);
-            s[0] &= 0xF8;
-            s[31] &= 0x7F;
-            s[31] |= 0x40;
-            kunciPenandatangananOfferor.setText(toBigInt(s));
-            // kunci penandatanganan bisa berumur panjang,
-            // compromised setelah dipakai membuat ttd, ttd lama yang sudah terjadi tetap terverifikasi kan.
-            // beda dengan kunci publik untuk enkripsi
-
-            // Sumber:
-            // N. Borisov, I. Goldberg dan E. Brewer, "Off-the-Record Communication, or, Why Not
-            // To Use PGP", in Proceedings of the 2004 ACM Workshop on Privacy in the Electronic
-            // Society - WPES '04, Yours Truly DC, West End, Washington DC, 2004, hal. 77-84.
-            // Tersedia: http://dl.acm.org/doi/abs/10.1145/1029179.1029200
-
-            //Jum'at, 29 Oktober 2004
-            //03.00-03.25 WITA
-
-            //Yours Truly DC (Place ID: ChIJ13PA3123t4kRzeDA41CDqCI)
-            //jalan New Hampshire 1143 barat laut, West End, Washington, DC, 20037, Amerika Serikat
-
-            //kunci pribadi di enkripsi dengan PBKDF2, password based key derivation function
-            //atau VERIFIKASI SIGNATURE
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        //BigInteger eksponenPenandatanganan = ((ASN1Integer) ((DLSequence) new ASN1InputStream(((DEROctetString) ((DLSequence) new ASN1InputStream(offerorKey.getEncoded()).readObject()).getObjectAt(2)).getOctets()).readObject()).getObjectAt(3)).getValue();
 
         ttdOfferor = findViewById(R.id.ttdOfferor);
         try {
             ttdOfferor.setText(tandatangannyaOfferor(penawaranElektronikPasal20UUITE2008.getText().toString()));
-        } catch (SignatureException | IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -250,20 +224,8 @@ public class MainActivity extends AppCompatActivity {
         TextInputEditText kunciVerifikasiOfferee = findViewById(R.id.kunciVerifikasiOfferee);
 
         try {
-            DERBitString dbs = (DERBitString) ((DLSequence) new ASN1InputStream(offereeCert.getPublicKey().getEncoded()).readObject()).getObjectAt(1);
-            byte[] oktet = dbs.getOctets();//cara mengubah ke KOORDINAT y
-
-            Ed25519.PointAffine pA = new Ed25519.PointAffine();
-            Ed25519.decodePointVar(oktet, 0, false, pA);
-
-            //ubah kunci publik jadi koordinat X dan Y
-            byte[] rY = new byte[Ed25519.PUBLIC_KEY_SIZE];
-            byte[] rX = new byte[Ed25519.PUBLIC_KEY_SIZE];
-            X25519Field.encode(pA.y, rY, 0);
-            X25519Field.encode(pA.x, rX, 0);
-
-            kunciVerifikasiOfferee.setText(new StringBuilder("Koordinat X: ").append(toBigInt(rX)).append("\nKoordinat Y:").append(toBigInt(rY)).toString());
-        } catch (IOException e) {
+            kunciVerifikasiOfferee.setText(bigIntToString(((ASN1Integer) ((DLSequence) new ASN1InputStream(((DERBitString) ((DLSequence) ((DLSequence) ((DLSequence) new ASN1InputStream(offereeCert.getEncoded()).readObject()).getObjectAt(0)).getObjectAt(6)).getObjectAt(1)).getOctets()).readObject()).getObjectAt(0)).getPositiveValue()));
+        } catch (IOException | CertificateEncodingException e) {
             e.printStackTrace();
         }
 
@@ -288,18 +250,7 @@ public class MainActivity extends AppCompatActivity {
                 SignerInformation signerInformation = new SMIMESigned(body).getSignerInfos().getSigners().iterator().next();
                 byte[] ttdnya = signerInformation.getSignature();
 
-                byte[] R = org.bouncycastle.util.Arrays.copyOfRange(ttdnya, 0, 32);//Decode the first half as a point R
-                Ed25519.PointAffine pAra = new Ed25519.PointAffine();
-                Ed25519.decodePointVar(R, 0, false, pAra);
-
-                byte[] rX = new byte[Ed25519.PUBLIC_KEY_SIZE];
-                byte[] rY = new byte[Ed25519.PUBLIC_KEY_SIZE];
-                X25519Field.encode(pAra.y, rY, 0);
-                X25519Field.encode(pAra.x, rX, 0);
-
-                byte[] S = org.bouncycastle.util.Arrays.copyOfRange(ttdnya, 32, 64);//Decode the second half as an integer S, in the range 0 <= s < L
-
-                ttdOfferee.setText(new StringBuilder("R.X: ").append(toBigInt(rX)).append("\nR.Y: ").append(toBigInt(rY)).append("\nS: ").append(toBigInt(S)).toString());
+                ttdOfferee.setText(sig(ttdnya));
                 offereeCert.checkValidity();
                 boolean hasil = signerInformation.verify(siv);
                 verifikasiTtdOfferee.setText(hasil ? "Pesan dari offeree utuh, tdk termodifikasi" : "termodifikasi");
@@ -311,30 +262,24 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private String tandatangannyaOfferor(String redaksinya) throws IOException, SignatureException {
+    private String tandatangannyaOfferor(String redaksinya) throws Exception {
         StringBuilder redaksi = new StringBuilder("Content-Type: application/x-www-form-urlencoded; charset=UTF-8\r\n" +
                 "Content-Transfer-Encoding: binary\r\n\r\n");
         redaksi.append("redaksiPerikatan=");
         redaksi.append(URLEncoder.encode(redaksinya, "utf-8"));//"Electronically Stored Information, electronic discovery, Federal Rules of Civil Procedure
         digestSignedAttr.reset();
-        byte[] digest = digestSignedAttr.digest(redaksi.toString().getBytes(StandardCharsets.UTF_8));
+        byte[] digest = digestSignedAttr.digest(redaksi.toString().getBytes("UTF-8"));
         parameters.put(CMSAttributeTableGenerator.DIGEST, Arrays.clone(digest));
         AttributeTable signed = sAttrGen.getAttributes(Collections.unmodifiableMap(parameters));
         ASN1Set signedAttr = new DERSet(signed.toASN1EncodableVector());
         byte[] teks = signedAttr.getEncoded(ASN1Encoding.DER);//"Electronically Stored Information, electronic discovery, Federal Rules of Civil Procedure
-        signature.update(teks);
+        signature.update(teks, 0, teks.length);
         byte[] sig = signature.sign();
-        byte[] R = org.bouncycastle.util.Arrays.copyOfRange(sig, 0, 32);//Decode the first half as a point R
-        Ed25519.PointAffine pAra = new Ed25519.PointAffine();
-        Ed25519.decodePointVar(R, 0, false, pAra);
-        byte[] rX = new byte[Ed25519.PUBLIC_KEY_SIZE];
-        byte[] rY = new byte[Ed25519.PUBLIC_KEY_SIZE];
-        X25519Field.encode(pAra.y, rY, 0);
-        X25519Field.encode(pAra.x, rX, 0);
-        byte[] S = org.bouncycastle.util.Arrays.copyOfRange(sig, 32, 64);//Decode the second half as an integer S, in the range 0 <= s < L
-        return new StringBuilder("R.X: ").append(toBigInt(rX))
-                .append("\nR.Y: ").append(toBigInt(rY))
-                .append("\nS: ").append(toBigInt(S)).toString();
+        return sig(sig);
+    }
+
+    private String sig(byte[] sig) {
+        return bigIntToString(new BigInteger(1, sig));
     }
 
     private void formValidation() throws Exception {
@@ -349,7 +294,6 @@ public class MainActivity extends AppCompatActivity {
             final String content,
             final String alamatPenjual) {
         return es.submit(() -> {
-            offerorCert.checkValidity();
             MimeBodyPart aPart = new MimeBodyPart();
             aPart.setContent(content, "application/x-www-form-urlencoded; charset=UTF-8");
             aPart.setHeader("Content-Transfer-Encoding", "binary");
@@ -370,7 +314,7 @@ public class MainActivity extends AppCompatActivity {
             con.setRequestProperty("Connection", "close");
             con.setRequestProperty("From", from);
             con.setRequestProperty("AS2-Version", "1.1");
-            con.setRequestProperty("AS2-From", "mycompanyAS2");
+            con.setRequestProperty("AS2-From", uniqueID);
             con.setRequestProperty("AS2-To", "mendelsontestAS2");
             con.setRequestProperty("Subject", "https://s.id/tr1-2");
             con.setRequestProperty("Message-Id", new StringBuilder("<github-dawud-tan-").append(new SimpleDateFormat("ddMMyyyyHHmmssZ", getCurrentLocale(this)).format(new Date())).append("-").append(new Random().nextLong()).append("@mycompanyAS2_mendelsontestAS2>").toString());
@@ -396,31 +340,74 @@ public class MainActivity extends AppCompatActivity {
     private void inisialisasi() {
         InputStream masukan = MainActivity.class.getResourceAsStream("/offeree.crt");//untuk kunci publik penjual
         try {
-            //KeyInfo.isInsideSecureHardware
-            //KeyInfo.isUserAuthenticationRequirementEnforcedBySecureHardware()
-            digest = MessageDigest.getInstance("sha512", "BC25519");
             offereeCert = PemUtils.decodeCertificate(masukan);
-            masukan = MainActivity.class.getResourceAsStream("/offeror.crt");//untuk kunci publik pembeli
-            offerorCert = PemUtils.decodeCertificate(masukan);
-            masukan = MainActivity.class.getResourceAsStream("/offeror.key");//untuk kunci penandatangan pembeli
-            offerorKey = PemUtils.decodePrivateKey(masukan, "ED25519");
             Objects.requireNonNull(masukan).close();
             masukan = null;
 
-            siv = new JcaSimpleSignerInfoVerifierBuilder().setProvider("BC25519").build(offereeCert.getPublicKey());
-            signature = Signature.getInstance("ed25519", "BC25519");
+            digest = MessageDigest.getInstance("SHA512");
+
+            SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+            if (sharedPref.getBoolean(FIRST, true)) {
+                KeyPairGenerator mKeyPairGenerator = keyPairGenerator();
+                mKeyPairGenerator.initialize(getParams());
+                mKeyPairGenerator.generateKeyPair();
+
+                KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+                keyStore.load(null);
+                offerorCert = (X509Certificate) keyStore.getCertificate(KEY_NAME);
+
+                uniqueID = UUID.randomUUID().toString();
+
+                sharedPref.edit().putString("uniqueID", uniqueID).commit();
+                String sertifikat = new String(Base64.encode(offerorCert.getEncoded()), "utf8");
+                es.submit(() -> {
+                    try {
+                        String pUID = URLEncoder.encode(uniqueID, "utf-8");
+                        String pSert = URLEncoder.encode(sertifikat, "utf-8");
+                        String urlParameters = "guid=" + pUID + "&kunciPublik=" + pSert;
+                        byte[] postData = urlParameters.getBytes("utf8");
+
+                        String request = getString(R.string.tambahSertifikat);
+                        URL url = new URL(request);
+                        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                        conn.setDoOutput(true);
+                        conn.setDoInput(false);
+                        conn.setRequestMethod("POST");
+                        conn.setRequestProperty("Connection", "close");
+                        conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                        conn.setRequestProperty("charset", "utf-8");
+                        DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
+                        wr.write(postData);
+                        wr.flush();
+                        wr.close();
+                        conn.getResponseCode();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }).get();
+                sharedPref.edit().putBoolean(FIRST, false).apply();
+            } else {
+                uniqueID = sharedPref.getString("uniqueID", "--heu--");
+            }
+
+            KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+            keyStore.load(null);
+            offerorCert = (X509Certificate) keyStore.getCertificate(KEY_NAME);
+            offerorKey = (PrivateKey) keyStore.getKey(KEY_NAME, null);
+
+            siv = new JcaSimpleSignerInfoVerifierBuilder().build(offereeCert.getPublicKey());
+            signature = Signature.getInstance("SHA512withRSA");
             signature.initSign(offerorKey);
 
             SignerInfoGenerator signer = new JcaSimpleSignerInfoGeneratorBuilder()
-                    .setProvider("BC25519")
-                    .build("ed25519", offerorKey, offerorCert);
+                    .build("SHA512withRSA", offerorKey, offerorCert);
 
             gen = new SMIMESignedGenerator();
             gen.addSignerInfoGenerator(signer);
             //secara default, content-transfer-encoding base64
             gen.setContentTransferEncoding("binary");
 
-        } catch (IOException | CertificateException | NoSuchProviderException | NoSuchAlgorithmException | InvalidKeySpecException | OperatorCreationException | InvalidKeyException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -444,4 +431,59 @@ public class MainActivity extends AppCompatActivity {
         NetworkInfo jaringanAktif = manajerKonektivitas.getActiveNetworkInfo();
         return jaringanAktif != null && (jaringanAktif.getType() == ConnectivityManager.TYPE_MOBILE || jaringanAktif.getType() == ConnectivityManager.TYPE_WIFI);
     }
+
+    private KeyPairGenerator keyPairGenerator() throws NoSuchProviderException, NoSuchAlgorithmException {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            return KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_RSA, "AndroidKeyStore");
+        else
+            return KeyPairGenerator.getInstance("RSA", "AndroidKeyStore");
+    }
+
+    private AlgorithmParameterSpec getParams() {
+        Calendar start = new GregorianCalendar();
+        Calendar end = new GregorianCalendar();
+        end.add(1, Calendar.YEAR);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2 && Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            return new KeyPairGeneratorSpec.Builder(this)
+                    .setAlias(KEY_NAME)
+                    .setSubject(new X500Principal("CN=" + KEY_NAME))
+                    .setSerialNumber(BigInteger.valueOf(1337))
+                    .setStartDate(start.getTime())
+                    .setEndDate(end.getTime())
+                    .build();
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+            return new KeyGenParameterSpec.Builder(KEY_NAME, KeyProperties.PURPOSE_SIGN)
+                    .setCertificateNotBefore(start.getTime())
+                    .setCertificateNotAfter(end.getTime())
+                    .setCertificateSerialNumber(BigInteger.valueOf(1337))
+                    .setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1)
+                    .setUserAuthenticationRequired(false)
+                    .setKeySize(2048)
+                    .setDigests(KeyProperties.DIGEST_SHA512)
+                    .build();
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            return new KeyGenParameterSpec.Builder(KEY_NAME, KeyProperties.PURPOSE_SIGN)
+                    .setCertificateNotBefore(start.getTime())
+                    .setCertificateNotAfter(end.getTime())
+                    .setCertificateSerialNumber(BigInteger.valueOf(1337))
+                    .setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1)
+                    .setUserAuthenticationRequired(false)
+                    .setUserConfirmationRequired(false)
+                    .setUserAuthenticationValidWhileOnBody(false)
+                    .setUnlockedDeviceRequired(false)
+                    .setUserPresenceRequired(false)
+                    .setKeySize(2048)
+                    .setDigests(KeyProperties.DIGEST_SHA512)
+                    .build();
+        } else {
+            return new KeyPairGeneratorSpec.Builder(this)
+                    .setAlias(KEY_NAME)
+                    .setSubject(new X500Principal("CN=" + KEY_NAME))
+                    .setSerialNumber(BigInteger.valueOf(1337))
+                    .setStartDate(start.getTime())
+                    .setEndDate(end.getTime())
+                    .build();
+        }
+    }
+
 }

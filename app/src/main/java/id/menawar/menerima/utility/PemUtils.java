@@ -6,12 +6,9 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.security.spec.InvalidKeySpecException;
 
 /**
  * Utility classes to extract PublicKey, PrivateKey, and X509Certificate from openssl generated PEM files
@@ -20,10 +17,6 @@ import java.security.spec.InvalidKeySpecException;
  * @version $Revision: 1 $
  */
 public final class PemUtils {
-    static {
-        BouncyIntegration.init();
-    }
-
     private PemUtils() {
     }
 
@@ -31,20 +24,6 @@ public final class PemUtils {
         byte[] der = pemToDer(is);
         ByteArrayInputStream bis = new ByteArrayInputStream(der);
         return DerUtils.decodeCertificate(bis);
-    }
-
-    /**
-     * Extract a private key that is a PKCS#8 PEM string (base64 encoded
-     * PKCS#8).
-     */
-    public static PrivateKey decodePrivateKey(String pem, String algorithm) throws IOException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
-        byte[] der = pemToDer(pem);
-        return DerUtils.decodePrivateKey(der, algorithm);
-    }
-
-    public static PrivateKey decodePrivateKey(InputStream is, String algorithm) throws IOException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
-        String pem = pemFromStream(is);
-        return decodePrivateKey(pem, algorithm);
     }
 
     /**

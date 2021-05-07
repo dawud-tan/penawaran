@@ -3,7 +3,6 @@ package org.bouncycastle.operator.jcajce;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.jcajce.io.OutputStreamFactory;
 import org.bouncycastle.jcajce.util.DefaultJcaJceHelper;
-import org.bouncycastle.jcajce.util.NamedJcaJceHelper;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.DefaultSignatureAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.OperatorCreationException;
@@ -28,13 +27,6 @@ public class JcaContentSignerBuilder {
         this.signatureAlgorithm = signatureAlgorithm;
         this.sigAlgId = new DefaultSignatureAlgorithmIdentifierFinder().find(signatureAlgorithm);
         this.sigAlgSpec = null;
-    }
-
-
-    public JcaContentSignerBuilder setProvider(String providerName) {
-        this.helper = new OperatorHelper(new NamedJcaJceHelper(providerName));
-
-        return this;
     }
 
     public ContentSigner build(PrivateKey privateKey)

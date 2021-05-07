@@ -2,8 +2,6 @@ package org.bouncycastle.operator.jcajce;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.jcajce.util.DefaultJcaJceHelper;
-import org.bouncycastle.jcajce.util.NamedJcaJceHelper;
-import org.bouncycastle.jcajce.util.ProviderJcaJceHelper;
 import org.bouncycastle.operator.DigestCalculator;
 import org.bouncycastle.operator.DigestCalculatorProvider;
 import org.bouncycastle.operator.OperatorCreationException;
@@ -12,7 +10,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
-import java.security.Provider;
 
 public class JcaDigestCalculatorProviderBuilder {
     private OperatorHelper helper = new OperatorHelper(new DefaultJcaJceHelper());
@@ -20,14 +17,7 @@ public class JcaDigestCalculatorProviderBuilder {
     public JcaDigestCalculatorProviderBuilder() {
     }
 
-    public JcaDigestCalculatorProviderBuilder setProvider(String providerName) {
-        this.helper = new OperatorHelper(new NamedJcaJceHelper(providerName));
-
-        return this;
-    }
-
-    public DigestCalculatorProvider build()
-            throws OperatorCreationException {
+    public DigestCalculatorProvider build() {
         return algorithm -> {
             final DigestOutputStream stream;
 

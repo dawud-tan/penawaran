@@ -20,7 +20,7 @@ public class MessageDigestUtils {
      * @return a string representing the standard name - the OID as a string if none available.
      */
     public static String getDigestName(ASN1ObjectIdentifier digestAlgOID) {
-        String name = "SHA-512";  // for pre 1.5 JDK
+        String name = (String) digestOidMap.get(digestAlgOID);  // for pre 1.5 JDK
         if (name != null) {
             return name;
         }
