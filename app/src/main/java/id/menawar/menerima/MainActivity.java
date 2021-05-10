@@ -43,30 +43,34 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 
-import org.bouncycastle.asn1.ASN1Encoding;
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.DERBitString;
-import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.DERSet;
-import org.bouncycastle.asn1.DLSequence;
-import org.bouncycastle.asn1.cms.AttributeTable;
-import org.bouncycastle.asn1.cms.CMSObjectIdentifiers;
-import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.cms.CMSAttributeTableGenerator;
-import org.bouncycastle.cms.DefaultSignedAttributeTableGenerator;
-import org.bouncycastle.cms.SignerInfoGenerator;
-import org.bouncycastle.cms.SignerInformation;
-import org.bouncycastle.cms.SignerInformationVerifier;
-import org.bouncycastle.cms.jcajce.JcaSimpleSignerInfoGeneratorBuilder;
-import org.bouncycastle.cms.jcajce.JcaSimpleSignerInfoVerifierBuilder;
-import org.bouncycastle.mail.smime.SMIMESigned;
-import org.bouncycastle.mail.smime.SMIMESignedGenerator;
-import org.bouncycastle.util.Arrays;
-import org.bouncycastle.util.encoders.Base64;
+import org.spongycastle.asn1.ASN1Encoding;
+import org.spongycastle.asn1.ASN1InputStream;
+import org.spongycastle.asn1.ASN1Integer;
+import org.spongycastle.asn1.ASN1Primitive;
+import org.spongycastle.asn1.ASN1Set;
+import org.spongycastle.asn1.DERBitString;
+import org.spongycastle.asn1.DERNull;
+import org.spongycastle.asn1.DEROctetString;
+import org.spongycastle.asn1.DERSet;
+import org.spongycastle.asn1.DLSequence;
+import org.spongycastle.asn1.cms.AttributeTable;
+import org.spongycastle.asn1.cms.CMSAttributes;
+import org.spongycastle.asn1.cms.CMSObjectIdentifiers;
+import org.spongycastle.asn1.cms.Time;
+import org.spongycastle.asn1.nist.NISTObjectIdentifiers;
+import org.spongycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.spongycastle.asn1.x509.AlgorithmIdentifier;
+import org.spongycastle.cms.CMSAttributeTableGenerator;
+import org.spongycastle.cms.DefaultSignedAttributeTableGenerator;
+import org.spongycastle.cms.SignerInfoGenerator;
+import org.spongycastle.cms.SignerInformation;
+import org.spongycastle.cms.SignerInformationVerifier;
+import org.spongycastle.cms.jcajce.JcaSimpleSignerInfoGeneratorBuilder;
+import org.spongycastle.cms.jcajce.JcaSimpleSignerInfoVerifierBuilder;
+import org.spongycastle.mail.smime.SMIMESigned;
+import org.spongycastle.mail.smime.SMIMESignedGenerator;
+import org.spongycastle.util.Arrays;
+import org.spongycastle.util.encoders.Base64;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -111,7 +115,7 @@ import id.menawar.menerima.utility.PemUtils;
 
 public class MainActivity extends AppCompatActivity {
     private CoordinatorLayout mCoordinatorLayout;
-    private TextInputEditText alamatOfferee, penawaranElektronikPasal20UUITE2008, dwimalisasiRedaksiPenawaran, ttdOfferor, responOfferee, ttdOfferee, verifikasiTtdOfferee;
+    private TextInputEditText alamatOfferee, penawaranElektronikPasal20UUITE2008, dwimalisasiRedaksiPenawaran, ttdOfferor, waktuPenandatanganan, hashPesan, responOfferee, ttdOfferee, verifikasiTtdOfferee;
     private final ExecutorService es = Executors.newSingleThreadExecutor();
     private X509Certificate offereeCert;
     private X509Certificate offerorCert;
@@ -126,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
     private static String KEY_NAME = "pasangan_kunci";
     private static String FIRST = "pertama-kali-pasang";
     private String uniqueID;
+    private SimpleDateFormat dateFormat;
 
 //    static {
 //        System.loadLibrary("frida-gadget");
@@ -160,8 +165,11 @@ public class MainActivity extends AppCompatActivity {
         inisialisasi();
         mCoordinatorLayout = findViewById(R.id.koordinatorLayout);
         alamatOfferee = findViewById(R.id.alamatOfferee);
+        waktuPenandatanganan = findViewById(R.id.waktuPenandatanganan);
+        hashPesan = findViewById(R.id.hashPesan);
         penawaranElektronikPasal20UUITE2008 = findViewById(R.id.penawaranElektronikPasal20UUITE2008);
         penawaranElektronikPasal20UUITE2008.requestFocus();
+        dateFormat = new SimpleDateFormat("dd MMMM yyyy, HH:mm:ss z");
         sAttrGen = new DefaultSignedAttributeTableGenerator();
 
         parameters = new HashMap();
@@ -172,6 +180,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             digestSignedAttr = MessageDigest.getInstance("SHA512");
         } catch (NoSuchAlgorithmException e) {
+            Snackbar.make(mCoordinatorLayout, e.getMessage(), Snackbar.LENGTH_LONG).show();
             e.printStackTrace();
         }
         /*
@@ -203,6 +212,7 @@ public class MainActivity extends AppCompatActivity {
                     dwimalisasiRedaksiPenawaran.setText(getDvimalString(editable.toString()));
                     ttdOfferor.setText(tandatangannyaOfferor(editable.toString()));
                 } catch (Exception e) {
+                    Snackbar.make(mCoordinatorLayout, e.getMessage(), Snackbar.LENGTH_LONG).show();
                     e.printStackTrace();
                 }
             }
@@ -217,6 +227,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             ttdOfferor.setText(tandatangannyaOfferor(penawaranElektronikPasal20UUITE2008.getText().toString()));
         } catch (Exception e) {
+            Snackbar.make(mCoordinatorLayout, e.getMessage(), Snackbar.LENGTH_LONG).show();
             e.printStackTrace();
         }
 
@@ -226,6 +237,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             kunciVerifikasiOfferee.setText(bigIntToString(((ASN1Integer) ((DLSequence) new ASN1InputStream(((DERBitString) ((DLSequence) ((DLSequence) ((DLSequence) new ASN1InputStream(offereeCert.getEncoded()).readObject()).getObjectAt(0)).getObjectAt(6)).getObjectAt(1)).getOctets()).readObject()).getObjectAt(0)).getPositiveValue()));
         } catch (IOException | CertificateEncodingException e) {
+            Snackbar.make(mCoordinatorLayout, e.getMessage(), Snackbar.LENGTH_LONG).show();
             e.printStackTrace();
         }
 
@@ -254,7 +266,7 @@ public class MainActivity extends AppCompatActivity {
                 offereeCert.checkValidity();
                 boolean hasil = signerInformation.verify(siv);
                 verifikasiTtdOfferee.setText(hasil ? "Pesan dari offeree utuh, tdk termodifikasi" : "termodifikasi");
-                TampilkanPerubahanFragment.newInstance().show(getSupportFragmentManager(), "1");
+                ResponOffereeFragment.newInstance().show(getSupportFragmentManager(), "1");
             } catch (Exception ex) {
                 Snackbar.make(mCoordinatorLayout, ex.getMessage(), Snackbar.LENGTH_LONG).show();
                 ex.printStackTrace();
@@ -269,8 +281,17 @@ public class MainActivity extends AppCompatActivity {
         redaksi.append(URLEncoder.encode(redaksinya, "utf-8"));//"Electronically Stored Information, electronic discovery, Federal Rules of Civil Procedure
         digestSignedAttr.reset();
         byte[] digest = digestSignedAttr.digest(redaksi.toString().getBytes("UTF-8"));
+        hashPesan.setText(new String(Base64.encode(digest), "utf8"));
+
         parameters.put(CMSAttributeTableGenerator.DIGEST, Arrays.clone(digest));
         AttributeTable signed = sAttrGen.getAttributes(Collections.unmodifiableMap(parameters));
+
+        ASN1Set attrValues = signed.get(CMSAttributes.signingTime).getAttrValues();
+        ASN1Primitive validSigningTime = attrValues.getObjectAt(0).toASN1Primitive();
+        Time signingTime = Time.getInstance(validSigningTime);
+        Date tangPen = signingTime.getDate();
+        waktuPenandatanganan.setText(dateFormat.format(tangPen));
+
         ASN1Set signedAttr = new DERSet(signed.toASN1EncodableVector());
         byte[] teks = signedAttr.getEncoded(ASN1Encoding.DER);//"Electronically Stored Information, electronic discovery, Federal Rules of Civil Procedure
         signature.update(teks, 0, teks.length);
@@ -288,6 +309,8 @@ public class MainActivity extends AppCompatActivity {
             alamatOfferee.requestFocus();
             throw new Exception("Alamat Penjual belum ditentukan");
         }
+        if (!daringKah())
+            throw new Exception("tidak ada internet!");
     }
 
     public Future<MimeMultipart> CallSynchronous(
@@ -298,6 +321,21 @@ public class MainActivity extends AppCompatActivity {
             aPart.setContent(content, "application/x-www-form-urlencoded; charset=UTF-8");
             aPart.setHeader("Content-Transfer-Encoding", "binary");
             MimeMultipart aSignedData = gen.generate(aPart);
+
+            SignerInformation signerInformation = new SMIMESigned(aSignedData).getSignerInfos().getSigners().iterator().next();
+            AttributeTable table = signerInformation.getSignedAttributes();
+
+            ASN1Set attrValues1 = table.get(CMSAttributes.messageDigest).getAttrValues();
+            ASN1Primitive validMessageDigest = attrValues1.getObjectAt(0).toASN1Primitive();
+            DEROctetString signedMessageDigest = (DEROctetString) validMessageDigest;
+            hashPesan.setText(new String(Base64.encode(signedMessageDigest.getOctets()), "utf8"));
+
+            ASN1Set attrValues = table.get(CMSAttributes.signingTime).getAttrValues();
+            ASN1Primitive validSigningTime = attrValues.getObjectAt(0).toASN1Primitive();
+            Time signingTime = Time.getInstance(validSigningTime);
+            Date tangPen = signingTime.getDate();
+            waktuPenandatanganan.setText(dateFormat.format(tangPen));
+
             MimeBodyPart output = new MimeBodyPart();
             output.setContent(aSignedData);
             output.setHeader("Content-Type", aSignedData.getContentType());
@@ -306,7 +344,7 @@ public class MainActivity extends AppCompatActivity {
             URL urlPenjual = new URL(alamatPenjual);
             InetAddress alamatIPPenjual = InetAddress.getByName(urlPenjual.getHost());
             if (alamatIPPenjual.isSiteLocalAddress())
-                throw new RuntimeException("Alamat IP Penjual privat, tidak bisa dicapai.");
+                throw new RuntimeException("Alamat IP Penjual pribadi, tidak bisa dicapai.");
             HttpURLConnection con = (HttpURLConnection) urlPenjual.openConnection();
             con.setRequestMethod("POST");
             con.setDoInput(true);
@@ -360,31 +398,37 @@ public class MainActivity extends AppCompatActivity {
 
                 sharedPref.edit().putString("uniqueID", uniqueID).commit();
                 String sertifikat = new String(Base64.encode(offerorCert.getEncoded()), "utf8");
-                es.submit(() -> {
-                    try {
-                        String pUID = URLEncoder.encode(uniqueID, "utf-8");
-                        String pSert = URLEncoder.encode(sertifikat, "utf-8");
-                        String urlParameters = "guid=" + pUID + "&kunciPublik=" + pSert;
-                        byte[] postData = urlParameters.getBytes("utf8");
+                if (daringKah())
+                    es.submit(() -> {
+                        try {
+                            String pUID = URLEncoder.encode(uniqueID, "utf-8");
+                            String pSert = URLEncoder.encode(sertifikat, "utf-8");
+                            String urlParameters = "guid=" + pUID + "&kunciPublik=" + pSert;
+                            byte[] postData = urlParameters.getBytes("utf8");
 
-                        String request = getString(R.string.tambahSertifikat);
-                        URL url = new URL(request);
-                        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                        conn.setDoOutput(true);
-                        conn.setDoInput(false);
-                        conn.setRequestMethod("POST");
-                        conn.setRequestProperty("Connection", "close");
-                        conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-                        conn.setRequestProperty("charset", "utf-8");
-                        DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
-                        wr.write(postData);
-                        wr.flush();
-                        wr.close();
-                        conn.getResponseCode();
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                }).get();
+                            String request = getString(R.string.tambahSertifikat);
+                            URL url = new URL(request);
+                            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                            conn.setDoOutput(true);
+                            conn.setDoInput(false);
+                            conn.setRequestMethod("POST");
+                            conn.setRequestProperty("Connection", "close");
+                            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                            conn.setRequestProperty("charset", "utf-8");
+                            DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
+                            wr.write(postData);
+                            wr.flush();
+                            wr.close();
+                            conn.getResponseCode();
+                        } catch (Exception ex) {
+                            Snackbar.make(mCoordinatorLayout, ex.getMessage(), Snackbar.LENGTH_LONG).show();
+                            ex.printStackTrace();
+                        }
+                    }).get();
+                else {
+                    Snackbar.make(mCoordinatorLayout, "tidak ada internet", Snackbar.LENGTH_LONG).show();
+                    throw new RuntimeException("tidak ada Internet");
+                }
                 sharedPref.edit().putBoolean(FIRST, false).apply();
             } else {
                 uniqueID = sharedPref.getString("uniqueID", "--heu--");
@@ -408,6 +452,7 @@ public class MainActivity extends AppCompatActivity {
             gen.setContentTransferEncoding("binary");
 
         } catch (Exception e) {
+            Snackbar.make(mCoordinatorLayout, e.getMessage(), Snackbar.LENGTH_LONG).show();
             e.printStackTrace();
         }
     }
@@ -472,6 +517,7 @@ public class MainActivity extends AppCompatActivity {
                     .setUserAuthenticationValidWhileOnBody(false)
                     .setUnlockedDeviceRequired(false)
                     .setUserPresenceRequired(false)
+                    .setIsStrongBoxBacked(false)
                     .setKeySize(2048)
                     .setDigests(KeyProperties.DIGEST_SHA512)
                     .build();

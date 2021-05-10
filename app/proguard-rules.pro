@@ -21,7 +21,7 @@
 -dontwarn org.junit.**
 -dontwarn junit.**
 -dontwarn sun.misc.**
--keep class org.bouncycastle.** { *; }
+-keep class org.spongycastle.** { *; }
 -dontwarn javax.naming.**
 -dontwarn java.awt.**,javax.activation.**,java.beans.**
 -dontwarn javax.security.**

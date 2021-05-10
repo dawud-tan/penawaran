@@ -86,6 +86,38 @@
                 style="@style/TextInputLayout.OutlineBox.CustomFont"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:hint="@string/waktuPenandatanganan">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/waktuPenandatanganan"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textMultiLine"
+                    android:maxLines="3"
+                    android:scrollbars="vertical" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/TextInputLayout.OutlineBox.CustomFont"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hashPesan">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/hashPesan"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textMultiLine"
+                    android:maxLines="3"
+                    android:scrollbars="vertical" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/TextInputLayout.OutlineBox.CustomFont"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:hint="@string/responOfferee">
 
                 <com.google.android.material.textfield.TextInputEditText

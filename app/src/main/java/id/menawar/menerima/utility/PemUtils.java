@@ -1,6 +1,6 @@
 package id.menawar.menerima.utility;
 
-import org.bouncycastle.util.encoders.Base64;
+import org.spongycastle.util.encoders.Base64;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;

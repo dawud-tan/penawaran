@@ -8,6 +8,8 @@
     <string name="kunciVerifikasiOfferee" translatable="false">Modulus verifikasinya Offeree (Penerima)</string>
     <string name="responOfferee" translatable="false">Respon Offeree (Penerima)</string>
     <string name="ttdOfferor" translatable="false"><![CDATA[TTD Digital Penawar RSASSA-PKCS1-v1_5, emsa^d mod n]]></string>
+    <string name="waktuPenandatanganan" translatable="false">Waktu Penandatanganan</string>
+    <string name="hashPesan" translatable="false">Base64 hash SHA-512nya redaksi penawaran</string>
     <string name="dwimalisasiRedaksiPenawaran" translatable="false">Penyandian Dwimal Redaksi Penawaran</string>
     <string name="penawaranElektronikPasal20UUITE2008" translatable="false">(sila ketik) Redaksi Penawaran Elektronik (Pasal 20 UU ITE 2008)</string>
     <string name="hintAlamatOfferee" translatable="false">Alamat Offeree (Penerima)</string>
